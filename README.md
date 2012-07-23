@@ -1,4 +1,4 @@
 wedit
 =====
 
-Lightweight web file browser
+Lightweight web file editor
