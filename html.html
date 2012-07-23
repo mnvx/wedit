@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru-RU">
+
+<head>
+<title>Iris Webfile Editor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="SHORTCUT ICON" href="favicon.png" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="jquery-1.7.2.min.js"></script>
+
+<script type="text/javascript" language="javascript">
+function onload()
+{
+  //Если редактируем файл, то загрузим его с сервера
+  var filename = $('#filename').val();
+  if (filename != '' && filename != null) {
+    $.ajax({
+      type: "POST",
+      url: "file.php",
+      data: { 
+        operation: "load",
+        filename: filename
+      }
+    }).done(function(msg) {
+      var result = jQuery.parseJSON(msg);
+      //Загрузим файл
+      var content = $('#contents');
+      $(content).removeAttr('disabled');
+      //Отобразим содержимое
+      $(content).val(result.content);
+      //Обновим состояние
+      $('#status').html(result.status);
+      $('input#encoding').val(result.encoding);
+    });
+  }
+}
+
+function t(text)
+{
+  for (var i=0; i<lang.length; i++) {
+    if (lang[i].phrase == text) {
+      return lang[i].translate;
+    }
+  }
+  return text;
+}
+
+[#lang#]
+</script>
+</head>
+
+<body onLoad="onload();">
+
+[#body#]
+
+</body>
+</html>
