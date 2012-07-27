@@ -5,10 +5,11 @@
     var $root_path = "./..";
 
     //Способ логина (Iris или пусто)
-    var $logintype = "Iris";
+    var $logintype = "";
+//    var $logintype = "Iris";
 
     //Кодировка имён файлов в фаловой системе
-    //var $filename_encoding = "cp1251";
+    var $filename_encoding = "cp1251";
 
     //Язык
     var $language = "ru";

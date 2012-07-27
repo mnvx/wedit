@@ -1,13 +1,21 @@
+<div>[#info#]</div>
 <p>[#path#]</p>
 <hr>
 <div>[#list#]</div>
 <hr>
 <div id="buttons">
-<input type="button" value="&uarr; [#Upload#]&hellip; (todo)"/>
+<input type="button" value="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
+<!--
 <input type="button" value="&darr; [#Download#] (todo)"/>
+-->
 <input type="button" id="btn_create" value="[#Create#]&hellip;" onclick="createFile();"/>
 <input type="button" value="[#Change#]&hellip;" onclick="changeFile();"/>
-<input type="button" value="&empty; [#Delete#] (todo)"/>
+<input type="button" value="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
+</div>
+
+<div id="dialog" style="display: none;">
+<form id="dialog" method="post">
+</form>
 </div>
 
 <div style="display: none;">
@@ -16,20 +24,34 @@
 </div>
 
 <script type="text/javascript" language="javascript">
+//Доступность кнопок
 function enableButtons(enable)
 {
   if (enable) {
-    $('[input[type=button]').removeAttr('disabled');
+    $(':button').removeAttr('disabled');
   }
   else {
-    $('[input[type=button]').attr('disabled', 'true');
+    $(':button').attr('disabled', 'true');
   }
 }
+
+//Доступность чекбоксов
+function enableCheckbox(enable)
+{
+  if (enable) {
+    $(':checkbox[id^=f_*]').removeAttr('disabled');
+  }
+  else {
+    $(':checkbox[id^=f_*]').attr('disabled', 'true');
+  }
+}
+
 
 //Создать файл
 function createFile()
 {
   enableButtons(false);
+  enableCheckbox(false);
   $('#files').append('<tr id="files_create_row">'+
   	'<td></td>'+
   	'<td><input id="_newname" type="string" size=15 value="new.txt"/></td>'+
@@ -37,7 +59,7 @@ function createFile()
   	'<td></td>'+
   	'<td></td>'+
   	'<td></td>'+
-  	'<td></td>'+
+//  	'<td></td>'+
   	'<td><form id="create" method="post">'+
   	  '<input id="operation" name="operation" type="hidden" value="create"/>'+
   	  '<input id="newname" name="newname" type="hidden"/>'+
@@ -58,46 +80,122 @@ function sendCreateFile()
 function cancelCreateFile()
 {
   enableButtons(true);
+  enableCheckbox(true);
   $('#files_create_row').remove();
 }
 
+
+//Изменить файл
 function changeFile()
 {
   if ($('input:checked[id^=f_*]').length != 1) {
     alert(t('You must select only one file for this operation'));
     return;
   }
-  else {
-    enableButtons(false);
-    var row = $('input:checked[id^=f_*]').parent().parent();
-    var old_filename = row.children('td:eq(1)').children('a').html();
-    row.children('td:eq(1)').html(
-      '<input type="text" id="_changename" size=15 value="'+old_filename+'"/>'
-    );
-    //row.children('td:eq(3)').html(
-    //  '<input type="text" id="_chengeaccess" size=5 value="'+row.children('td:eq(3)').html()+'"/>'
-  	//);
-  	row.children('td:eq(7)').html(
-      '<form id="change" method="post">'+
-        '<input id="operation" name="operation" type="hidden" value="change"/>'+
-        '<input id="oldname" name="oldname" type="hidden" value="'+old_filename+'"/>'+
-        '<input id="changename" name="changename" type="hidden"/>'+
-        //'<input id="chengeaccess" name="chengeaccess" type="hidden"/>'+
-        '<input id="change_ok" type="button" value="'+t('OK')+'" onclick="sendChangeFile();"/>'+
-        '<input id="change_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
-      '</form>'
-    );
-  }
+
+  enableButtons(false);
+  enableCheckbox(false);
+  var row = $('input:checked[id^=f_*]').parent().parent();
+  var old_filename = row.children('td:eq(1)').children('a').html();
+  row.children('td:eq(1)').html(
+    '<input type="text" id="_changename" size=15 value="'+old_filename+'"/>'
+  );
+  row.children('td:eq(6)').html(
+    '<form id="change" method="post">'+
+      '<input id="operation" name="operation" type="hidden" value="change"/>'+
+      '<input id="oldname" name="oldname" type="hidden" value="'+old_filename+'"/>'+
+      '<input id="changename" name="changename" type="hidden"/>'+
+      '<input id="change_ok" type="button" value="'+t('OK')+'" onclick="sendChangeFile();"/>'+
+      '<input id="change_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+    '</form>'
+  );
 }
 
 function sendChangeFile()
 {
   $('#changename').val($('#_changename').val());
-  //$('#chengeaccess').val($('#_chengeaccess').val());
   $('#change').submit();
 }
 
 function cancelChangeFile()
+{
+  $('#cancel').submit();
+}
+
+
+//Удалить файл
+function deleteFile()
+{
+  if ($('input:checked[id^=f_*]').length < 1) {
+    alert(t('You must select one or more files for this operation'));
+    return;
+  }
+
+  enableButtons(false);
+  enableCheckbox(false);
+  $('#buttons').hide();
+  var row;
+  var filelist = new Array();
+  var filename;
+  var filenames = '<h2>'+t('Do you really want to delete next files')+'?</h2>';
+  filenames += '<ul>';
+
+  $('input:checked[id^=f_*]').each(function (i, el) {
+    row = $(el).parent().parent();
+    filename = row.children('td:eq(1)').children('a').html();
+    filenames += '<li>'+filename+'</li>';
+    filelist[filelist.length] = filename;
+  });
+  filenames += '</ul>';
+  filenames += 
+    '<form id="delete" method="post">'+
+      '<input id="operation" name="operation" type="hidden" value="delete"/>'+
+      '<input id="filelist" name="filelist" type="hidden"/>'+
+      '<input id="delete_ok" type="button" value="'+t('Delete')+'" onclick="sendDeleteFile();"/>'+
+      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+    '</form>';
+
+  $('#dialog').html(filenames);
+  $('#filelist').val(JSON.stringify(filelist));
+  $('#dialog').show();
+}
+
+function sendDeleteFile()
+{
+  $('#delete').submit();
+}
+
+function cancelDeleteFile()
+{
+  $('#cancel').submit();
+}
+
+
+//Загрузить файл
+function uploadFile()
+{
+  enableButtons(false);
+  enableCheckbox(false);
+  $('#buttons').hide();
+  var dialog = '<h2>'+t('Select files for upload')+'</h2>';
+  dialog += 
+    '<form id="upload" method="post" enctype="multipart/form-data">'+
+      '<input id="operation" name="operation" type="hidden" value="upload"/>'+
+      '<input id="filelist" name="file[]" type="file" multiple="true"/>'+
+      '<input id="delete_ok" type="button" value="'+t('Upload')+'" onclick="sendUploadFile();"/>'+
+      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelUploadFile();"/>'+
+    '</form>';
+
+  $('#dialog').html(dialog);
+  $('#dialog').show();
+}
+
+function sendUploadFile()
+{
+  $('#upload').submit();
+}
+
+function cancelUploadFile()
 {
   $('#cancel').submit();
 }

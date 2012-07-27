@@ -1,10 +1,10 @@
 <?php
 
+include_once('json_lib.php');
 require_once('settings.php');
 require_once('lang.php');
 
 $html = file_get_contents('html.html');
-
 //Загрузка языков
 $js_lang = '';
 foreach ($lang[$settings->language] as $phrase => $translate) {
@@ -79,7 +79,10 @@ foreach ($path_array as $val) {
 
 //Если надо выполнить какие-то команды над файлами
 //TODO: коды ошибок
+$info = '';
 switch ($_POST['operation']) {
+
+  //Создание файла
   case 'create':
     $new_filename = $current.'/'.$_POST['newname'];
     if (!file_exists($new_filename)) {
@@ -91,12 +94,53 @@ switch ($_POST['operation']) {
       }
     }
     break;
+
+  //Изменение файла (переименование)
   case 'change':
     $old_filename = $current.'/'.$_POST['oldname'];
     $change_filename = $current.'/'.$_POST['changename'];
     if (file_exists($old_filename)) {
       rename($old_filename, $change_filename);
       //chmod($change_filename, $_POST['changeaccess']);
+    }
+    break;
+
+  //Удаление файлов
+  case 'delete':
+    $json = new Services_JSON();
+    $filenames = $json->decode($_POST['filelist']);
+    foreach($filenames as $name) {
+      $filename = $current.'/'.$name;
+      if (file_exists($filename)) {
+        unlink($filename);
+      }
+    }
+    break;
+
+  //Загрузка файлов
+  case 'upload':
+    if (isset($_FILES)) {
+      $loaded = 0;
+      foreach($_FILES['file']['name'] as $i => $name) {
+
+        $filename = $current.'/'.$name;
+        if (file_exists($filename)) {
+          $info .= '<li>'.$filename.' ('.t('File already exists').')</li>';
+          continue;
+        }
+        else {
+          if (!move_uploaded_file($_FILES['file']['tmp_name'][$i], $filename)) {
+            $info .= '<li>'.$filename.' ('.t('Copy error').')</li>';
+            continue;
+          }
+        }
+        $loaded++;
+      }
+      $info = $info ? '<h3>Не удалось загрузить следующие файлы</h3><ul>'.$info.'</ul>' : $info;
+      $info .= '<h3>'.t('Files loaded').': '.$loaded.' '.t('from').' '.count($_FILES['file']['name']).'</h3><hr>';
+    }
+    else {
+      $info .= '<h3>'.t('Files not selected for upload').'</h3>';
     }
     break;
 }
@@ -111,7 +155,7 @@ if (!is_file($current)) {
     '<th>'.t('Name').'</th>'.
     '<th>'.t('Type').'</th>'.
     '<th>'.t('Access').'</th>'.
-    '<th>'.t('Ext').'</th>'.
+//    '<th>'.t('Ext').'</th>'.
     '<th>'.t('Size').'</th>'.
     '<th>'.t('Change date').'</th>'.
     '<th></th>'.
@@ -138,10 +182,10 @@ if (!is_file($current)) {
         '<td><a href="'.$link_rel.'">'.$item['name'].'</a></td>'.
         '<td>'.($item['is_dir'] ? t('Directory'): '').'</td>'.
         '<td>'.$item['access'].'</td>'.
-        '<td>'.$item['ext'].'</td>'.
+//        '<td>'.$item['ext'].'</td>'.
         '<td>'.$item['size'].'</td>'.
         '<td>'.$item['modifydate'].'</td>'.
-        '<td></td>'.
+        '<td><a href="'.$link_rel.'&action=download">'.t('Download').'</a></td>'.
         '</tr>';
     }
   }
@@ -150,6 +194,7 @@ if (!is_file($current)) {
 
   $html_list = file_get_contents('list.html');
   $html = str_replace('[#body#]', $html_list, $html);
+  $html = str_replace('[#info#]', $info, $html);
   $html = str_replace('[#list#]', $list, $html);
   $html = str_replace('[#Upload#]', t('Upload'), $html);
   $html = str_replace('[#Download#]', t('Download'), $html);
@@ -158,18 +203,26 @@ if (!is_file($current)) {
   $html = str_replace('[#Delete#]', t('Delete'), $html);
   $html = str_replace('[#Rename#]', t('Rename'), $html);
 }
-//TODO: Если в $current - файл, то открывать его на редактирование
 else {
-  $contents = '<textarea></textarea>';
+  //Если в $current - файл и его надо скачать, то отдаём его на скачивание
+  if ($_GET['action'] == 'download') {
+    //header('Content-Type: application/octet-stream');
+    //header('Location: '.$current);
+    $html .= 'TODO';
+  }
+  else {  
+    //Если в $current - файл, то открывать его на редактирование
+    $contents = '<textarea></textarea>';
 
-  $html_edit = file_get_contents('edit.html');
-  $html = str_replace('[#body#]', $html_edit, $html);
-  $html = str_replace('[#filename#]', $current, $html);
-  $html = str_replace('[#status#]', t('Loading').'...', $html);
-  $html = str_replace('[#Save#]', t('Save'), $html);
-  $html = str_replace('[#Reload#]', t('Reload'), $html);
+    $html_edit = file_get_contents('edit.html');
+    $html = str_replace('[#body#]', $html_edit, $html);
+    $html = str_replace('[#filename#]', $current, $html);
+    $html = str_replace('[#status#]', t('Loading').'...', $html);
+    $html = str_replace('[#Save#]', t('Save'), $html);
+    $html = str_replace('[#Reload#]', t('Reload'), $html);
 
-  $html = str_replace('[#savestatus#]', t('Saving').'&hellip;', $html);
+    $html = str_replace('[#savestatus#]', t('Saving').'&hellip;', $html);
+  }
 }
 
 $html = str_replace('[#path#]', $path, $html);
@@ -202,8 +255,8 @@ function read_from_directory($directory, $sort_column = null, $sort_order = null
     $temp['access'] = (is_readable($item_abs) ? 'r' : '-').
       (is_writable($item_abs) ? 'w' : '-').
       (is_executable($item_abs) ? 'x' : '-');
-    $temp['ext'] = (is_link($item_abs) ? 'l' : '').
-      (is_uploaded_file($item_abs) ? 'u' : '');
+//    $temp['ext'] = (is_link($item_abs) ? 'l' : '').
+//      (is_uploaded_file($item_abs) ? 'u' : '');
     $temp['modifydate'] = date("d.m.Y H:i:s", fileatime($item_abs)); //дата изменения
   }
   
