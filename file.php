@@ -10,16 +10,21 @@ $operation = $_POST['operation'];
 $result = null;
 
 switch ($operation) {
+
   //Открытие файла
   case 'load':
     $result['content'] = load_file($_POST['filename']);
-    $encoding = detect_encoding($result['content']);
+    $encoding = $_POST['encoding'];
+    if (!$encoding) {
+      $encoding = detect_encoding($result['content']);
+    }
     if ($encoding && $encoding != 'utf-8') {
-      $result['content'] = iconv(detect_encoding($result['content']), 'utf-8', $result['content']);
+      $result['content'] = iconv($encoding, 'utf-8', $result['content']);
     }
     $result['status'] = t('Loaded');
     $result['encoding'] = $encoding;
     break;
+    
   //Сохранение файла
   case 'save':
     $encoding = $_POST['encoding'];

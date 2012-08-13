@@ -143,6 +143,51 @@ switch ($_POST['operation']) {
       $info .= '<h3>'.t('Files not selected for upload').'</h3>';
     }
     break;
+
+  //скачивание
+  case 'download':
+    $filename = $current.'/'.$_POST['filename'];
+    $basename = $_POST['filename'];
+    //Скачивание одного файла
+    if ($_POST['filename'] && is_file($filename)) {
+      file_download($filename, $basename);
+    }
+    //Скачивание каталога - кладём его в zip
+    elseif ($_POST['filename'] && is_dir($filename)) {
+      $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
+      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $zip = new ZipArchiveDir();
+      $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
+      $zip->addDir($filename, $basename);
+      $zip->close();
+      file_download($tmpfilename, $basename.'.zip');
+      unset($tmpfilename);
+    }
+    //Скачивание нескольких файлов/каталогов - кладём их в zip
+    elseif ($_POST['filelist']) {
+      $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
+      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $zip = new ZipArchiveDir();
+      $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
+
+      $json = new Services_JSON();
+      $filenames = $json->decode($_POST['filelist']);
+      foreach($filenames as $name) {
+        $filename = $current.'/'.$name;
+        if (file_exists($filename)) {
+          if (is_dir($filename)) {
+            $zip->addDir($filename, $name);
+          }
+          else {
+            $zip->addFile($filename, $name);
+          }
+        }
+      }
+      $zip->close();
+      file_download($tmpfilename);
+      unset($tmpfilename);
+    }
+    break;
 }
 
 
@@ -185,7 +230,7 @@ if (!is_file($current)) {
 //        '<td>'.$item['ext'].'</td>'.
         '<td>'.$item['size'].'</td>'.
         '<td>'.$item['modifydate'].'</td>'.
-        '<td><a href="'.$link_rel.'&action=download">'.t('Download').'</a></td>'.
+        '<td></td>'.
         '</tr>';
     }
   }
@@ -204,25 +249,15 @@ if (!is_file($current)) {
   $html = str_replace('[#Rename#]', t('Rename'), $html);
 }
 else {
-  //Если в $current - файл и его надо скачать, то отдаём его на скачивание
-  if ($_GET['action'] == 'download') {
-    //header('Content-Type: application/octet-stream');
-    //header('Location: '.$current);
-    $html .= 'TODO';
-  }
-  else {  
-    //Если в $current - файл, то открывать его на редактирование
-    $contents = '<textarea></textarea>';
+  //Если в $current - файл, то открывать его на редактирование
+  $contents = '<textarea></textarea>';
 
-    $html_edit = file_get_contents('edit.html');
-    $html = str_replace('[#body#]', $html_edit, $html);
-    $html = str_replace('[#filename#]', $current, $html);
-    $html = str_replace('[#status#]', t('Loading').'...', $html);
-    $html = str_replace('[#Save#]', t('Save'), $html);
-    $html = str_replace('[#Reload#]', t('Reload'), $html);
-
-    $html = str_replace('[#savestatus#]', t('Saving').'&hellip;', $html);
-  }
+  $html_edit = file_get_contents('edit.html');
+  $html = str_replace('[#body#]', $html_edit, $html);
+  $html = str_replace('[#filename#]', $current, $html);
+  $html = str_replace('[#status#]', t('Loading').'...', $html);
+  $html = str_replace('[#Save#]', t('Save'), $html);
+  $html = str_replace('[#Reload#]', t('Reload'), $html);
 }
 
 $html = str_replace('[#path#]', $path, $html);
@@ -281,4 +316,75 @@ function filename_decode($name, $encoding)
   return $encoding ? iconv($filename_encoding, 'utf-8', $name) : $name;
 }
 
+
+//Скачать файл
+function file_download($filename, $download_as_name = '', $mimetype = 'application/octet-stream') {
+  if (file_exists($filename)) {
+    if (!$download_as_name) {
+      $download_as_name = $filename;
+    }
+    header($_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
+    header('Content-Type: ' . $mimetype);
+    header('Last-Modified: ' . gmdate('r', filemtime($filename)));
+    header('ETag: ' . sprintf('%x-%x-%x', fileinode($filename), filesize($filename), filemtime($filename)));
+    header('Content-Length: ' . (filesize($filename)));
+    header('Connection: close');
+    header('Content-Disposition: attachment; filename="' . basename($download_as_name) . '";');
+    //Открываем искомый файл
+    $f=fopen($filename, 'r');
+    while(!feof($f)) {
+    //Читаем килобайтный блок, отдаем его в вывод и сбрасываем в буфер
+      echo fread($f, 1024);
+      flush();
+    }
+    //Закрываем файл
+    fclose($f);
+  } else {
+    header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
+    header('Status: 404 Not Found');
+  }
+  exit;
+}
+
+
+//Расширение класса ZipArchive для сжатия каталога
+class ZipArchiveDir extends ZipArchive { 
+  public function addDir($path, $sub) { 
+    $this->addEmptyDir($sub); 
+    $nodes = glob($path.'/*'); 
+    foreach ($nodes as $node) { 
+      $filename = str_replace($path.'/', '', $node);
+      $subname = $sub.($sub ? '/' : '').$filename;
+      //echo $subname.'<br>';
+      if (is_dir($node)) { 
+        $this->addDir($node, $subname); 
+      }
+      elseif (is_file($node)) {
+        $this->addFile($node, $subname); 
+      }
+    } 
+  }     
+} // class ZipArchiveDir 
+
+
+//Генерируем GUID
+function create_guid() {
+	if (function_exists('com_create_guid')){
+		//убираем {} и в нижний регистр, чтобы работало и как varchar
+		return strtolower(substr(com_create_guid(), 1, 36));
+	} 
+	else {
+		mt_srand((double)microtime()*10000);
+		$charid = strtoupper(md5(uniqid(rand(), true)));
+		$hyphen = chr(45);// "-"
+		$uuid = chr(123)// "{"
+			.substr($charid, 0, 8).$hyphen
+			.substr($charid, 8, 4).$hyphen
+			.substr($charid,12, 4).$hyphen
+			.substr($charid,16, 4).$hyphen
+			.substr($charid,20,12)
+			.chr(125);// "}"
+		return strtolower(substr($uuid, 1, 36));
+	}
+}
 ?>

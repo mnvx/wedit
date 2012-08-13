@@ -5,10 +5,8 @@
 <hr>
 <div id="buttons">
 <input type="button" value="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
-<!--
-<input type="button" value="&darr; [#Download#] (todo)"/>
--->
-<input type="button" id="btn_create" value="[#Create#]&hellip;" onclick="createFile();"/>
+<input type="button" value="&darr; [#Download#]" onclick="downloadFile();"/>
+<input type="button" value="[#Create#]&hellip;" onclick="createFile();"/>
 <input type="button" value="[#Change#]&hellip;" onclick="changeFile();"/>
 <input type="button" value="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
 </div>
@@ -20,6 +18,8 @@
 
 <div style="display: none;">
 <form id="cancel" method="post">
+</form>
+<form id="download" method="post">
 </form>
 </div>
 
@@ -55,7 +55,7 @@ function createFile()
   $('#files').append('<tr id="files_create_row">'+
   	'<td></td>'+
   	'<td><input id="_newname" type="string" size=15 value="new.txt"/></td>'+
-  	'<td><select id="_newtype"><option>Directory</option><option selected>File</option></select></td>'+
+  	'<td><select id="_newtype"><option>'+t('Directory')+'</option><option selected>'+t('File')+'</option></select></td>'+
   	'<td></td>'+
   	'<td></td>'+
   	'<td></td>'+
@@ -198,6 +198,40 @@ function sendUploadFile()
 function cancelUploadFile()
 {
   $('#cancel').submit();
+}
+
+
+//Скачать файлы/каталоги
+function downloadFile()
+{
+  var selected = $('input:checked[id^=f_*]').length;
+  if (selected < 1) {
+    alert(t('You must select one or more files for this operation'));
+    return;
+  }
+
+  var filelist = new Array();
+
+  $('input:checked[id^=f_*]').each(function (i, el) {
+    row = $(el).parent().parent();
+    filename = row.children('td:eq(1)').children('a').html();
+    filelist[filelist.length] = filename;
+  });
+
+  var file = '';
+  if (selected == 1) {
+    file = '<input id="filename" name="filename" type="hidden" value="'+filename+'"/>';
+  }
+
+  var row = $('input:checked[id^=f_*]').parent().parent();
+  var filename = row.children('td:eq(1)').children('a').html();
+  $('#download').html(
+    '<input id="operation" name="operation" type="hidden" value="download"/>'+
+    '<input id="filelist" name="filelist" type="hidden"/>'+
+    file
+  );
+  $('#filelist').val(JSON.stringify(filelist));
+  $('#download').submit();
 }
 
 </script>

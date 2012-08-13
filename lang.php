@@ -15,6 +15,7 @@ $lang = array(
     'Name' => 'Name',
     'Type' => 'Type',
     'Directory' => 'Directory',
+    'File' => 'File',
     'Access' => 'Access',
     'Ext' => 'Ext',
     'Size' => 'Size',
@@ -38,6 +39,7 @@ $lang = array(
     'Files loaded' => 'Files loaded',
     'from' => 'from',
     'Files not selected for upload' => 'Files not selected for upload',
+    'Reloading' => 'Reloading',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -53,6 +55,7 @@ $lang = array(
     'Name' => 'Название',
     'Type' => 'Тип',
     'Directory' => 'Каталог',
+    'File' => 'Файл',
     'Access' => 'Доступ',
     'Ext' => 'Доп',
     'Size' => 'Размер',
@@ -76,6 +79,7 @@ $lang = array(
     'Files loaded' => 'Загружено файлов',
     'from' => 'из',
     'Files not selected for upload' => 'Не выбраны файлы для загрузки',
+    'Reloading' => 'Повторное открытие',
   ),
 );
 

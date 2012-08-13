@@ -3,18 +3,25 @@
 <div id="status">[#status#]</div>
 <hr>
 <div><textarea id="contents" disabled="true"></textarea></div>
-<hr>
-<input type="button" value="&uarr; [#Save#]" onclick="saveFile();"/>
 
-<input id="encoding" type="hidden" value=""/>
+<hr>
+
+<table width="100%"><tbody><tr><td>
+<input type="button" value="&uarr; [#Save#]" onclick="saveFile();"/>
+</td>
+<td align="right">
+Кодировка: <input id="encoding" type="text" value=""/>
+<input type="button" value="[#Reload#] (todo)" onclick="reloadFile();"/>
+</td></tr></tbody></table>
+
 <input id="filename" type="hidden" value="[#filename#]"/>
-<input id="savestatus" type="hidden" value="[#savestatus#]"/>
 
 <script type="text/javascript" language="javascript">
+
 //Сохранить файл
 function saveFile()
 {
-  $('#status').html($('#savestatus').val());
+  $('#status').html(t('Saving')+'&hellip;');
   content = $('#contents');
   content.attr('disabled', 'true');
   var filename = $('#filename').val();
@@ -36,4 +43,31 @@ function saveFile()
     });
   }
 }
+
+//Перечитать файл
+function reloadFile()
+{
+  $('#status').html(t('Reloading'));
+  content = $('#contents');
+  content.attr('disabled', 'true');
+  var filename = $('#filename').val();
+  if (filename != '' && filename != null) {
+    $.ajax({
+      type: "POST",
+      url: "file.php",
+      data: { 
+        operation: "load",
+        filename: filename,
+        encoding: $('input#encoding').val()
+      }
+    }).done(function(msg) {
+      content.removeAttr('disabled');
+      var result = jQuery.parseJSON(msg);
+      //Обновим состояние
+      $('#status').html(result.status);
+      $('textarea#contents').val(result.content);
+    });
+  }
+}
+
 </script>
