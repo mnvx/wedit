@@ -1,18 +1,23 @@
-<p>[#path#]</p>
-<hr>
+<div id="address">
+<table width="100%"><tbody><tr>
+<td>[#path#]</td>
+<td align="right"><h1>Wedit</h1></td>
+</tr></tbody></table>
+</div>
 <div id="status">[#status#]</div>
-<hr>
-<div><textarea id="contents" disabled="true"></textarea></div>
+<div id="text"><textarea id="contents" disabled="true"></textarea></div>
 
-<hr>
-
-<table width="100%"><tbody><tr><td>
-<input type="button" value="&uarr; [#Save#]" onclick="saveFile();"/>
+<div id="buttons">
+<table id="buttons-table" width="100%"><tbody><tr><td width="33%">
+<input type="button" value="[#Save#]" onclick="saveFile();"/>
 </td>
-<td align="right">
-Кодировка: <input id="encoding" type="text" value=""/>
-<input type="button" value="[#Reload#] (todo)" onclick="reloadFile();"/>
+<td align="center">
+Кодировка: <input class="field" id="encoding" type="text" size="10" value=""/>
+</td>
+<td width="33%" align="right">
+<input type="button" value="[#Reload#]" onclick="reloadFile();"/>
 </td></tr></tbody></table>
+</div>
 
 <input id="filename" type="hidden" value="[#filename#]"/>
 
@@ -39,7 +44,12 @@ function saveFile()
       content.removeAttr('disabled');
       var result = jQuery.parseJSON(msg);
       //Обновим состояние
-      $('#status').html(result.status);
+      if (result.code != false) {
+        $('#status').html('<span class="textsaved">' + result.status + '</span>');
+      }
+      else {
+        $('#status').html('<span class="texterror">' + result.status + '</span>');
+      }
     });
   }
 }

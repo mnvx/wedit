@@ -32,10 +32,19 @@ function onload()
       $('#status').html(result.status);
       $('input#encoding').val(result.encoding);
     });
+    //И установим высоту текстового редактора в полный экран
+    onResize();
+    $(window).bind('resize', function() {
+      onResize();
+    });
+
+    $('textarea#contents').keydown(function() {
+      $('#status').html('<span class="textchanged">'+t('Changed')+'</span>');
+    });
   }
 }
 
-function t(text)
+function t(text) 
 {
   for (var i=0; i<lang.length; i++) {
     if (lang[i].phrase == text) {
@@ -43,6 +52,14 @@ function t(text)
     }
   }
   return text;
+}
+
+function onResize() 
+{ 
+  $('#contents').height($(document).height() - 
+    ($('#address').outerHeight(true) + $('#status').outerHeight(true) + $('#buttons').outerHeight(true)) -
+    ($('#text').outerHeight(true) - $('#text').height() + 20)
+  );
 }
 
 [#lang#]

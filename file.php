@@ -3,6 +3,7 @@
 include_once('json_lib.php');
 include_once('lang.php');
 include_once('settings.php');
+include_once('common.php');
 
 $json = new Services_JSON();
 
@@ -13,7 +14,7 @@ switch ($operation) {
 
   //Открытие файла
   case 'load':
-    $result['content'] = load_file($_POST['filename']);
+    $result['content'] = file_get_contents(filename_encode($_POST['filename']));
     $encoding = $_POST['encoding'];
     if (!$encoding) {
       $encoding = detect_encoding($result['content']);
@@ -32,7 +33,7 @@ switch ($operation) {
     if ($encoding && $encoding != 'utf-8') {
       $content = iconv('utf-8', $encoding, $content);
     }
-    $result['code'] = save_file($_POST['filename'], $content);
+    $result['code'] = file_put_contents(filename_encode($_POST['filename']), $content);
     if ($result['code'] != false) {
       $result['status'] = t('Saved');
     }
@@ -46,24 +47,12 @@ echo $json->encode($result);
 return;
 
 
-//Кодировка имени файла в кодировку файловой системы
-function load_file($name)
-{
-  return file_get_contents($name);
-}
-
-
-//Декодировка имени файла в utf-8
-function save_file($name, $content)
-{
-  return file_put_contents($name, $content);
-}
-
 
 //TODO: распознавать кодировку файла по содержимому
 function detect_encoding($string)
 {
   return 'cp1251';
 }
+
 
 ?>

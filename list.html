@@ -1,12 +1,16 @@
 <div>[#info#]</div>
-<p>[#path#]</p>
-<hr>
-<div>[#list#]</div>
-<hr>
+<div id="address">
+<table width="100%"><tbody><tr>
+<td>[#path#]</td>
+<td align="right"><h1>Wedit</h1></td>
+</tr></tbody></table>
+</div>
+<div id="filelist">[#list#]</div>
 <div id="buttons">
 <input type="button" value="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
 <input type="button" value="&darr; [#Download#]" onclick="downloadFile();"/>
 <input type="button" value="[#Create#]&hellip;" onclick="createFile();"/>
+<input type="button" value="[#Copy#]&hellip;" onclick="copyFile();"/>
 <input type="button" value="[#Change#]&hellip;" onclick="changeFile();"/>
 <input type="button" value="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
 </div>
@@ -54,8 +58,9 @@ function createFile()
   enableCheckbox(false);
   $('#files').append('<tr id="files_create_row">'+
   	'<td></td>'+
-  	'<td><input id="_newname" type="string" size=15 value="new.txt"/></td>'+
-  	'<td><select id="_newtype"><option>'+t('Directory')+'</option><option selected>'+t('File')+'</option></select></td>'+
+  	'<td><input class="field" id="_newname" type="string" size=15 value="new.txt"/></td>'+
+  	'<td><select class="field" id="_newtype"><option value="Directory">'+t('Directory')+'</option>'+
+      '<option value="File" selected>'+t('File')+'</option></select></td>'+
   	'<td></td>'+
   	'<td></td>'+
   	'<td></td>'+
@@ -98,7 +103,7 @@ function changeFile()
   var row = $('input:checked[id^=f_*]').parent().parent();
   var old_filename = row.children('td:eq(1)').children('a').html();
   row.children('td:eq(1)').html(
-    '<input type="text" id="_changename" size=15 value="'+old_filename+'"/>'
+    '<input class="field" type="text" id="_changename" size=15 value="'+old_filename+'"/>'
   );
   row.children('td:eq(6)').html(
     '<form id="change" method="post">'+
@@ -156,7 +161,7 @@ function deleteFile()
     '</form>';
 
   $('#dialog').html(filenames);
-  $('#filelist').val(JSON.stringify(filelist));
+  $('input#filelist').val(JSON.stringify(filelist));
   $('#dialog').show();
 }
 
@@ -230,8 +235,69 @@ function downloadFile()
     '<input id="filelist" name="filelist" type="hidden"/>'+
     file
   );
-  $('#filelist').val(JSON.stringify(filelist));
+  $('input#filelist').val(JSON.stringify(filelist));
   $('#download').submit();
+}
+
+
+
+//Копировать файл
+function copyFile()
+{
+  var filescount = $('input:checked[id^=f_*]').length;
+  if (filescount < 1) {
+    alert(t('You must select one or more files for this operation'));
+    return;
+  }
+
+  enableButtons(false);
+  enableCheckbox(false);
+  $('#buttons').hide();
+  var row;
+  var filelist = new Array();
+  var filename;
+
+  var filenames = '<h2>'+t('Copy files or catalogs')+'</h2>';
+  filenames += '<ul>';
+  $('input:checked[id^=f_*]').each(function (i, el) {
+    row = $(el).parent().parent();
+    filename = row.children('td:eq(1)').children('a').html();
+    filenames += '<li>'+filename+'</li>';
+    filelist[filelist.length] = filename;
+  });
+  filenames += '</ul>';
+
+  if (filescount == 1) {
+    filenames += '<p>'+t('Specify a name for the copy, relative to the current catalog')+': </p>';
+  }
+  else {
+    filenames += '<p>'+t('Specify a catalog name to copy the selected items')+': </p>';
+  }
+
+  filenames += 
+  '<form id="copy" method="post">'+
+    '<input id="operation" name="operation" type="hidden" value="copy"/>'+
+    '<input id="filelist" name="filelist" type="hidden"/>'+
+    '<input id="copyname" name="copyname" type="text" size="60"/>'+
+  '</form>'+
+  '<p>'+
+    '<input id="copy_ok" type="button" value="'+t('Copy')+'" onclick="sendCopyFile();"/>'+
+    '<input id="copy_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelCopyFile();"/>'+
+  '</p>';
+
+  $('#dialog').html(filenames);
+  $('input#filelist').val(JSON.stringify(filelist));
+  $('#dialog').show();
+}
+
+function sendCopyFile()
+{
+  $('#copy').submit();
+}
+
+function cancelCopyFile()
+{
+  $('#copy').submit();
 }
 
 </script>

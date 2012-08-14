@@ -3,6 +3,7 @@
 include_once('json_lib.php');
 require_once('settings.php');
 require_once('lang.php');
+include_once('common.php');
 
 $html = file_get_contents('html.html');
 //Загрузка языков
@@ -49,14 +50,16 @@ if ($settings->logintype != '') {
     return;
   }
 }
-$filename_encoding = $settings->filename_encoding;
+//$filename_encoding = $settings->filename_encoding;
 
 
 //Определяем путь
 $root = str_replace('\\', '/', realpath($settings->root_path));
 $wedit = str_replace('\\', '/', realpath('.'));
 $p_path = str_replace('\\', '/', $_GET['path']);
-$p_path = filename_encode($p_path, $filename_encoding);
+//TODO: сортировка (формат: 1a - по первой колонке в алфавитном порядке)
+$p_sort = str_replace('\\', '/', $_GET['sort']);
+$p_path = filename_encode($p_path);
 
 //TODO: "/" в зависимости от ОС
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
@@ -70,7 +73,7 @@ $path = '';
 $path_simple = '';
 $path_array = explode('/', $current_rel);
 foreach ($path_array as $val) {
-  $val = filename_decode($val, $filename_encoding);
+  $val = filename_decode($val);
   $path_simple .= ($path_simple != '/' ? '/' : '').$val;
   $path .= ($path ? '/' : '<a href="?path=.">&hellip;</a>').'<a href="?path='.$path_simple.'">'.$val.'</a>';
 }
@@ -84,7 +87,7 @@ switch ($_POST['operation']) {
 
   //Создание файла
   case 'create':
-    $new_filename = $current.'/'.$_POST['newname'];
+    $new_filename = $current.'/'.filename_encode($_POST['newname']);
     if (!file_exists($new_filename)) {
       if ($_POST['newtype'] == 'Directory') {
         mkdir($new_filename);
@@ -97,11 +100,10 @@ switch ($_POST['operation']) {
 
   //Изменение файла (переименование)
   case 'change':
-    $old_filename = $current.'/'.$_POST['oldname'];
-    $change_filename = $current.'/'.$_POST['changename'];
+    $old_filename = $current.'/'.filename_encode($_POST['oldname']);
+    $change_filename = $current.'/'.filename_encode($_POST['changename']);
     if (file_exists($old_filename)) {
       rename($old_filename, $change_filename);
-      //chmod($change_filename, $_POST['changeaccess']);
     }
     break;
 
@@ -110,9 +112,10 @@ switch ($_POST['operation']) {
     $json = new Services_JSON();
     $filenames = $json->decode($_POST['filelist']);
     foreach($filenames as $name) {
-      $filename = $current.'/'.$name;
-      if (file_exists($filename)) {
-        unlink($filename);
+      $filename = $current.'/'.filename_encode($name);
+      //Воизбежание опасных удалений
+      if ($name != '.' && $name != '..') {
+        runlink($filename);
       }
     }
     break;
@@ -144,10 +147,10 @@ switch ($_POST['operation']) {
     }
     break;
 
-  //скачивание
+  //Скачивание
   case 'download':
-    $filename = $current.'/'.$_POST['filename'];
-    $basename = $_POST['filename'];
+    $filename = $current.'/'.filename_encode($_POST['filename']);
+    $basename = filename_encode($_POST['filename']);
     //Скачивание одного файла
     if ($_POST['filename'] && is_file($filename)) {
       file_download($filename, $basename);
@@ -158,7 +161,7 @@ switch ($_POST['operation']) {
       $tmpfilename = $tmp.'/'.create_guid().'.zip';
       $zip = new ZipArchiveDir();
       $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
-      $zip->addDir($filename, $basename);
+      $zip->addDir($filename, filename_encode(filename_decode($basename), $settings->filename_encoding_zip));
       $zip->close();
       file_download($tmpfilename, $basename.'.zip');
       unset($tmpfilename);
@@ -173,19 +176,43 @@ switch ($_POST['operation']) {
       $json = new Services_JSON();
       $filenames = $json->decode($_POST['filelist']);
       foreach($filenames as $name) {
-        $filename = $current.'/'.$name;
+        $filename = $current.'/'.filename_encode($name);
         if (file_exists($filename)) {
           if (is_dir($filename)) {
-            $zip->addDir($filename, $name);
+            $zip->addDir($filename, filename_encode($name, $settings->filename_encoding_zip));
           }
           else {
-            $zip->addFile($filename, $name);
+            $zip->addFile($filename, filename_encode($name, $settings->filename_encoding_zip));
           }
         }
       }
       $zip->close();
       file_download($tmpfilename);
       unset($tmpfilename);
+    }
+    break;
+
+  //Копирование файлов
+  case 'copy':
+    $json = new Services_JSON();
+    $copyname = $current.'/'.filename_encode($_POST['copyname']);
+    $filenames = $json->decode($_POST['filelist']);
+//    if (count($filenames) > 1 && is_file($copyname)) {
+//      break;
+//    }
+    if (count($filenames) > 1) {
+      mkdir($copyname);
+    }
+    foreach($filenames as $name) {
+      $filename = $current.'/'.filename_encode($name);
+      if (count($filenames) > 1) {
+        rcopy($filename, $copyname.'/'.filename_encode($name));
+      }
+      else {
+        if (!file_exists($copyname)) {
+          rcopy($filename, $copyname);
+        }
+      }
     }
     break;
 }
@@ -200,7 +227,6 @@ if (!is_file($current)) {
     '<th>'.t('Name').'</th>'.
     '<th>'.t('Type').'</th>'.
     '<th>'.t('Access').'</th>'.
-//    '<th>'.t('Ext').'</th>'.
     '<th>'.t('Size').'</th>'.
     '<th>'.t('Change date').'</th>'.
     '<th></th>'.
@@ -219,15 +245,14 @@ if (!is_file($current)) {
     if (($p_path != '.' || $link_rel) && $link_rel != $p_path) {
       $link_rel = $link_rel ? '?path='.$link_rel : '?path=.';
 
-      $item['name'] = filename_decode($item['name'], $filename_encoding);
-      $link_rel = filename_decode($link_rel, $filename_encoding);
+      $item['name'] = filename_decode($item['name']);
+      $link_rel = filename_decode($link_rel);
       
       $rows .= '<tr>'.
         '<td><input type="checkbox" id="f_'.$item['name'].'" name="'.$item['name'].'" value="'.$item['name'].'"></td>'.
         '<td><a href="'.$link_rel.'">'.$item['name'].'</a></td>'.
         '<td>'.($item['is_dir'] ? t('Directory'): '').'</td>'.
         '<td>'.$item['access'].'</td>'.
-//        '<td>'.$item['ext'].'</td>'.
         '<td>'.$item['size'].'</td>'.
         '<td>'.$item['modifydate'].'</td>'.
         '<td></td>'.
@@ -244,6 +269,7 @@ if (!is_file($current)) {
   $html = str_replace('[#Upload#]', t('Upload'), $html);
   $html = str_replace('[#Download#]', t('Download'), $html);
   $html = str_replace('[#Create#]', t('Create'), $html);
+  $html = str_replace('[#Copy#]', t('Copy'), $html);
   $html = str_replace('[#Change#]', t('Change'), $html);
   $html = str_replace('[#Delete#]', t('Delete'), $html);
   $html = str_replace('[#Rename#]', t('Rename'), $html);
@@ -254,7 +280,7 @@ else {
 
   $html_edit = file_get_contents('edit.html');
   $html = str_replace('[#body#]', $html_edit, $html);
-  $html = str_replace('[#filename#]', $current, $html);
+  $html = str_replace('[#filename#]', filename_decode($current), $html);
   $html = str_replace('[#status#]', t('Loading').'...', $html);
   $html = str_replace('[#Save#]', t('Save'), $html);
   $html = str_replace('[#Reload#]', t('Reload'), $html);
@@ -290,8 +316,6 @@ function read_from_directory($directory, $sort_column = null, $sort_order = null
     $temp['access'] = (is_readable($item_abs) ? 'r' : '-').
       (is_writable($item_abs) ? 'w' : '-').
       (is_executable($item_abs) ? 'x' : '-');
-//    $temp['ext'] = (is_link($item_abs) ? 'l' : '').
-//      (is_uploaded_file($item_abs) ? 'u' : '');
     $temp['modifydate'] = date("d.m.Y H:i:s", fileatime($item_abs)); //дата изменения
   }
   
@@ -303,44 +327,31 @@ function read_from_directory($directory, $sort_column = null, $sort_order = null
 }
 
 
-//Кодировка имени файла в кодировку файловой системы
-function filename_encode($name, $encoding)
-{
-  return $encoding ? iconv('utf-8', $filename_encoding, $name) : $name;
-}
-
-
-//Декодировка имени файла в utf-8
-function filename_decode($name, $encoding)
-{
-  return $encoding ? iconv($filename_encoding, 'utf-8', $name) : $name;
-}
-
-
 //Скачать файл
 function file_download($filename, $download_as_name = '', $mimetype = 'application/octet-stream') {
   if (file_exists($filename)) {
     if (!$download_as_name) {
       $download_as_name = $filename;
     }
-    header($_SERVER["SERVER_PROTOCOL"] . ' 200 OK');
-    header('Content-Type: ' . $mimetype);
-    header('Last-Modified: ' . gmdate('r', filemtime($filename)));
-    header('ETag: ' . sprintf('%x-%x-%x', fileinode($filename), filesize($filename), filemtime($filename)));
-    header('Content-Length: ' . (filesize($filename)));
+    header($_SERVER["SERVER_PROTOCOL"].' 200 OK');
+    header('Content-Type: '.$mimetype);
+    header('Last-Modified: '.gmdate('r', filemtime($filename)));
+    header('ETag: '.sprintf('%x-%x-%x', fileinode($filename), filesize($filename), filemtime($filename)));
+    header('Content-Length: '.(filesize($filename)));
     header('Connection: close');
-    header('Content-Disposition: attachment; filename="' . basename($download_as_name) . '";');
+    header('Content-Disposition: attachment; filename="'.basename($download_as_name).'";');
     //Открываем искомый файл
-    $f=fopen($filename, 'r');
+    $f = fopen($filename, 'r');
     while(!feof($f)) {
-    //Читаем килобайтный блок, отдаем его в вывод и сбрасываем в буфер
+      //Читаем килобайтный блок, отдаем его в вывод и сбрасываем в буфер
       echo fread($f, 1024);
       flush();
     }
     //Закрываем файл
     fclose($f);
-  } else {
-    header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
+  } 
+  else {
+    header($_SERVER["SERVER_PROTOCOL"].' 404 Not Found');
     header('Status: 404 Not Found');
   }
   exit;
@@ -367,24 +378,35 @@ class ZipArchiveDir extends ZipArchive {
 } // class ZipArchiveDir 
 
 
-//Генерируем GUID
-function create_guid() {
-	if (function_exists('com_create_guid')){
-		//убираем {} и в нижний регистр, чтобы работало и как varchar
-		return strtolower(substr(com_create_guid(), 1, 36));
-	} 
-	else {
-		mt_srand((double)microtime()*10000);
-		$charid = strtoupper(md5(uniqid(rand(), true)));
-		$hyphen = chr(45);// "-"
-		$uuid = chr(123)// "{"
-			.substr($charid, 0, 8).$hyphen
-			.substr($charid, 8, 4).$hyphen
-			.substr($charid,12, 4).$hyphen
-			.substr($charid,16, 4).$hyphen
-			.substr($charid,20,12)
-			.chr(125);// "}"
-		return strtolower(substr($uuid, 1, 36));
-	}
+// copies files and non-empty directories
+function rcopy($src, $dst) {
+  if (is_dir($src)) {
+    mkdir($dst);
+    $files = scandir($src);
+    foreach ($files as $file)
+    if ($file != "." && $file != "..") {
+      rcopy("$src/$file", "$dst/$file");
+    }
+  }
+  elseif (file_exists($src)) {
+    copy($src, $dst);
+  }
+}
+
+
+//Рекурсивное удаление
+function runlink($file) {
+  if (is_file($file)) {
+    unlink($file);
+  }
+  else {
+    $objs = scandir($file);
+    foreach($objs as $obj) {
+      if ($obj != "." && $obj != "..") {
+        is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj);
+      }
+    }
+    rmdir($file);
+  }
 }
 ?>

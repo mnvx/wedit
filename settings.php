@@ -10,6 +10,7 @@
 
     //Кодировка имён файлов в фаловой системе
     var $filename_encoding = "cp1251";
+    var $filename_encoding_zip = "cp866";
 
     //Язык
     var $language = "ru";

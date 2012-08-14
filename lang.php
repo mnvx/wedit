@@ -7,7 +7,8 @@ $lang = array(
     'Upload' => 'Upload',
     'Download' => 'Download',
     'Create' => 'Create',
-    'Change' => 'Change',
+    'Copy' => 'Copy',
+    'Change' => 'Rename',
     'Delete' => 'Delete',
     'Rename' => 'Rename',
     'Save' => 'Save',
@@ -40,6 +41,12 @@ $lang = array(
     'from' => 'from',
     'Files not selected for upload' => 'Files not selected for upload',
     'Reloading' => 'Reloading',
+    'Changed' => 'Changed',
+    'Copy files or catalogs' => 'Copy files or catalogs',
+    'Specify a name for the copy, relative to the current catalog' => 
+      'Specify a name for the copy, relative to the current catalog',
+    'Specify a catalog name to copy the selected items' => 
+      'Specify a catalog name to copy the selected items',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -47,7 +54,8 @@ $lang = array(
     'Upload' => 'Загрузить',
     'Download' => 'Скачать',
     'Create' => 'Создать',
-    'Change' => 'Изменить',
+    'Copy' => 'Копировать',
+    'Change' => 'Переименовать',
     'Delete' => 'Удалить',
     'Rename' => 'Переименовать',
     'Save' => 'Сохранить',
@@ -80,6 +88,12 @@ $lang = array(
     'from' => 'из',
     'Files not selected for upload' => 'Не выбраны файлы для загрузки',
     'Reloading' => 'Повторное открытие',
+    'Changed' => 'Изменено',
+    'Copy files or catalogs' => 'Копировать файлы или каталоги',
+    'Specify a name for the copy, relative to the current catalog' => 
+      'Укажите название для копирования (относительно текущего каталога)',
+    'Specify a catalog name to copy the selected items' => 
+      'Укажите название каталога для копирования выбранных элементов (относительно текущего каталога)',
   ),
 );
 
