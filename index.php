@@ -50,16 +50,17 @@ if ($settings->logintype != '') {
     return;
   }
 }
-//$filename_encoding = $settings->filename_encoding;
 
 
 //Определяем путь
 $root = str_replace('\\', '/', realpath($settings->root_path));
 $wedit = str_replace('\\', '/', realpath('.'));
 $p_path = str_replace('\\', '/', $_GET['path']);
-//TODO: сортировка (формат: 1a - по первой колонке в алфавитном порядке)
-$p_sort = str_replace('\\', '/', $_GET['sort']);
+//Сортировка (формат: 1a - по первой колонке в алфавитном порядке)
+$p_sort = $_GET['sort'];
+list($sort_column, $sort_order) = get_sort_params($p_sort);
 $p_path = filename_encode($p_path);
+$now_sort_link = $p_sort ? '&sort='.$p_sort : '';
 
 //TODO: "/" в зависимости от ОС
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
@@ -75,7 +76,7 @@ $path_array = explode('/', $current_rel);
 foreach ($path_array as $val) {
   $val = filename_decode($val);
   $path_simple .= ($path_simple != '/' ? '/' : '').$val;
-  $path .= ($path ? '/' : '<a href="?path=.">&hellip;</a>').'<a href="?path='.$path_simple.'">'.$val.'</a>';
+  $path .= ($path ? '/' : '<a href="?path=.'.$now_sort_link.'">&hellip;</a>').'<a href="?path='.$path_simple.$now_sort_link.'">'.$val.'</a>';
 }
 
 
@@ -224,17 +225,22 @@ if (!is_file($current)) {
   //Список файлов
   $list = '<table id="files"><thead><tr>'.
     '<th></th>'.
-    '<th>'.t('Name').'</th>'.
-    '<th>'.t('Type').'</th>'.
-    '<th>'.t('Access').'</th>'.
-    '<th>'.t('Size').'</th>'.
-    '<th>'.t('Change date').'</th>'.
+    '<th><a href="?path='.$path_simple.'&sort=1'.get_sort_direction(1, $p_sort).'" '.
+      'title="'.t('Sort by name').'">'.t('Name').'</a>'.get_sort_cursor(1, $p_sort).'</th>'.
+    '<th><a href="?path='.$path_simple.'&sort=2'.get_sort_direction(2, $p_sort).'" '.
+      'title="'.t('Sort by type').'">'.t('Type').'</a>'.get_sort_cursor(2, $p_sort).'</th>'.
+    '<th><a href="?path='.$path_simple.'&sort=3'.get_sort_direction(3, $p_sort).'" '.
+      'title="'.t('Sort by access').'">'.t('Access').'</a>'.get_sort_cursor(3, $p_sort).'</th>'.
+    '<th><a href="?path='.$path_simple.'&sort=4'.get_sort_direction(4, $p_sort).'" '.
+      'title="'.t('Sort by size').'">'.t('Size').'</a>'.get_sort_cursor(4, $p_sort).'</th>'.
+    '<th><a href="?path='.$path_simple.'&sort=5'.get_sort_direction(5, $p_sort).'" '.
+      'title="'.t('Sort by date').'">'.t('Change date').'</a>'.get_sort_cursor(5, $p_sort).'</th>'.
     '<th></th>'.
     '</tr></thead>'.
     '<tbody>[#tbody#]</tbody></table>';
 
   $rows = '';
-  $file_list = read_from_directory($current);
+  $file_list = read_from_directory($current, $sort_column, $sort_order);
   foreach ($file_list as $item) {
     $link = $current_rel.'/'.$item['name'];
     $link_abs = str_replace('\\', '/', realpath($root.'/'.$link));
@@ -242,18 +248,17 @@ if (!is_file($current)) {
       $link_abs = $root;
     }
     $link_rel = str_replace($root, '', $link_abs);
-    if (($p_path != '.' || $link_rel) && $link_rel != $p_path) {
+    if ((($p_path != '.' & $p_path != '/') || $link_rel) && $link_rel != $p_path) {
       $link_rel = $link_rel ? '?path='.$link_rel : '?path=.';
 
       $item['name'] = filename_decode($item['name']);
       $link_rel = filename_decode($link_rel);
-      
       $rows .= '<tr>'.
         '<td><input type="checkbox" id="f_'.$item['name'].'" name="'.$item['name'].'" value="'.$item['name'].'"></td>'.
-        '<td><a href="'.$link_rel.'">'.$item['name'].'</a></td>'.
+        '<td><a href="'.$link_rel.$now_sort_link.'">'.$item['name'].'</a></td>'.
         '<td>'.($item['is_dir'] ? t('Directory'): '').'</td>'.
         '<td>'.$item['access'].'</td>'.
-        '<td>'.$item['size'].'</td>'.
+        '<td class="number">'.($item['size'] > 0 || $item['size'] == '0' ? number_format($item['size'], 0, '.', ' ') : '').'</td>'.
         '<td>'.$item['modifydate'].'</td>'.
         '<td></td>'.
         '</tr>';
@@ -290,123 +295,4 @@ $html = str_replace('[#path#]', $path, $html);
 
 echo $html;
 
-
-//Чтение содержимого каталога в массив и сортировка
-function read_from_directory($directory, $sort_column = null, $sort_order = null)
-{
-  $array = null;
-  //Файлы и каталоги ведём отдельно, чтобы группировать их при сортировке
-  $array_dir = array();
-  $array_files = array();
-  $dir = scandir($directory);
-  for ($i=0; $i<count($dir); $i++) {
-    $item_abs = $directory.'/'.$dir[$i];
-    $is_dir = is_dir($item_abs);
-    
-    if ($is_dir) {
-      $temp =& $array_dir[];
-    }
-    else {
-      $temp =& $array_files[];
-    }
-
-    $temp['name'] = $dir[$i];
-    $temp['is_dir'] = $is_dir; //0 - файл, 1 - каталог
-    $temp['size'] = !$is_dir ? filesize($item_abs) : ''; //размер в байтах
-    $temp['access'] = (is_readable($item_abs) ? 'r' : '-').
-      (is_writable($item_abs) ? 'w' : '-').
-      (is_executable($item_abs) ? 'x' : '-');
-    $temp['modifydate'] = date("d.m.Y H:i:s", fileatime($item_abs)); //дата изменения
-  }
-  
-  //TODO: Сортируем
-  
-  //Объединяем список каталогов и файлов
-  $array = array_merge($array_dir, $array_files);
-  return $array;
-}
-
-
-//Скачать файл
-function file_download($filename, $download_as_name = '', $mimetype = 'application/octet-stream') {
-  if (file_exists($filename)) {
-    if (!$download_as_name) {
-      $download_as_name = $filename;
-    }
-    header($_SERVER["SERVER_PROTOCOL"].' 200 OK');
-    header('Content-Type: '.$mimetype);
-    header('Last-Modified: '.gmdate('r', filemtime($filename)));
-    header('ETag: '.sprintf('%x-%x-%x', fileinode($filename), filesize($filename), filemtime($filename)));
-    header('Content-Length: '.(filesize($filename)));
-    header('Connection: close');
-    header('Content-Disposition: attachment; filename="'.basename($download_as_name).'";');
-    //Открываем искомый файл
-    $f = fopen($filename, 'r');
-    while(!feof($f)) {
-      //Читаем килобайтный блок, отдаем его в вывод и сбрасываем в буфер
-      echo fread($f, 1024);
-      flush();
-    }
-    //Закрываем файл
-    fclose($f);
-  } 
-  else {
-    header($_SERVER["SERVER_PROTOCOL"].' 404 Not Found');
-    header('Status: 404 Not Found');
-  }
-  exit;
-}
-
-
-//Расширение класса ZipArchive для сжатия каталога
-class ZipArchiveDir extends ZipArchive { 
-  public function addDir($path, $sub) { 
-    $this->addEmptyDir($sub); 
-    $nodes = glob($path.'/*'); 
-    foreach ($nodes as $node) { 
-      $filename = str_replace($path.'/', '', $node);
-      $subname = $sub.($sub ? '/' : '').$filename;
-      //echo $subname.'<br>';
-      if (is_dir($node)) { 
-        $this->addDir($node, $subname); 
-      }
-      elseif (is_file($node)) {
-        $this->addFile($node, $subname); 
-      }
-    } 
-  }     
-} // class ZipArchiveDir 
-
-
-// copies files and non-empty directories
-function rcopy($src, $dst) {
-  if (is_dir($src)) {
-    mkdir($dst);
-    $files = scandir($src);
-    foreach ($files as $file)
-    if ($file != "." && $file != "..") {
-      rcopy("$src/$file", "$dst/$file");
-    }
-  }
-  elseif (file_exists($src)) {
-    copy($src, $dst);
-  }
-}
-
-
-//Рекурсивное удаление
-function runlink($file) {
-  if (is_file($file)) {
-    unlink($file);
-  }
-  else {
-    $objs = scandir($file);
-    foreach($objs as $obj) {
-      if ($obj != "." && $obj != "..") {
-        is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj);
-      }
-    }
-    rmdir($file);
-  }
-}
 ?>

@@ -1,8 +1,8 @@
 <?php
 
 include_once('json_lib.php');
-include_once('lang.php');
 include_once('settings.php');
+include_once('lang.php');
 include_once('common.php');
 
 $json = new Services_JSON();
@@ -46,13 +46,6 @@ switch ($operation) {
 echo $json->encode($result);
 return;
 
-
-
-//TODO: распознавать кодировку файла по содержимому
-function detect_encoding($string)
-{
-  return 'cp1251';
-}
 
 
 ?>

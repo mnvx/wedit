@@ -47,6 +47,11 @@ $lang = array(
       'Specify a name for the copy, relative to the current catalog',
     'Specify a catalog name to copy the selected items' => 
       'Specify a catalog name to copy the selected items',
+    'Sort by name' => 'Sort by name',
+    'Sort by type' => 'Sort by type',
+    'Sort by access' => 'Sort by access',
+    'Sort by size' => 'Sort by size',
+    'Sort by date' => 'Sort by date',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -94,6 +99,11 @@ $lang = array(
       'Укажите название для копирования (относительно текущего каталога)',
     'Specify a catalog name to copy the selected items' => 
       'Укажите название каталога для копирования выбранных элементов (относительно текущего каталога)',
+    'Sort by name' => 'Сортировать по названию',
+    'Sort by type' => 'Сортировать по типу',
+    'Sort by access' => 'Сортировать по доступу',
+    'Sort by size' => 'Сортировать по размеру',
+    'Sort by date' => 'Сортировать по дате',
   ),
 );
 

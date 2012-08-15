@@ -2,7 +2,7 @@
 <div id="address">
 <table width="100%"><tbody><tr>
 <td>[#path#]</td>
-<td align="right"><h1>Wedit</h1></td>
+<td align="right"><h1><a href="http://iris-crm.ru/wedit" title="Wedit home, about integration with Iris CRM">Wedit</a></h1></td>
 </tr></tbody></table>
 </div>
 <div id="filelist">[#list#]</div>
@@ -43,10 +43,11 @@ function enableButtons(enable)
 function enableCheckbox(enable)
 {
   if (enable) {
-    $(':checkbox[id^=f_*]').removeAttr('disabled');
+    $('input[type="checkbox"]').removeAttr('disabled');
   }
   else {
-    $(':checkbox[id^=f_*]').attr('disabled', 'true');
+    $('input[type="checkbox"]').attr('disabled', 'true');
+//    $(':checkbox[id^=f_*]').attr('disabled', 'true');
   }
 }
 
@@ -64,7 +65,6 @@ function createFile()
   	'<td></td>'+
   	'<td></td>'+
   	'<td></td>'+
-//  	'<td></td>'+
   	'<td><form id="create" method="post">'+
   	  '<input id="operation" name="operation" type="hidden" value="create"/>'+
   	  '<input id="newname" name="newname" type="hidden"/>'+
@@ -93,14 +93,14 @@ function cancelCreateFile()
 //Изменить файл
 function changeFile()
 {
-  if ($('input:checked[id^=f_*]').length != 1) {
+  if ($('input[type=checkbox]:checked').length != 1) {
     alert(t('You must select only one file for this operation'));
     return;
   }
 
   enableButtons(false);
   enableCheckbox(false);
-  var row = $('input:checked[id^=f_*]').parent().parent();
+  var row = $('input[type=checkbox]:checked').parent().parent();
   var old_filename = row.children('td:eq(1)').children('a').html();
   row.children('td:eq(1)').html(
     '<input class="field" type="text" id="_changename" size=15 value="'+old_filename+'"/>'
@@ -131,7 +131,7 @@ function cancelChangeFile()
 //Удалить файл
 function deleteFile()
 {
-  if ($('input:checked[id^=f_*]').length < 1) {
+  if ($('input[type=checkbox]:checked').length < 1) {
     alert(t('You must select one or more files for this operation'));
     return;
   }
@@ -145,7 +145,7 @@ function deleteFile()
   var filenames = '<h2>'+t('Do you really want to delete next files')+'?</h2>';
   filenames += '<ul>';
 
-  $('input:checked[id^=f_*]').each(function (i, el) {
+  $('input[type=checkbox]:checked').each(function (i, el) {
     row = $(el).parent().parent();
     filename = row.children('td:eq(1)').children('a').html();
     filenames += '<li>'+filename+'</li>';
@@ -209,7 +209,7 @@ function cancelUploadFile()
 //Скачать файлы/каталоги
 function downloadFile()
 {
-  var selected = $('input:checked[id^=f_*]').length;
+  var selected = $('input[type=checkbox]:checked').length;
   if (selected < 1) {
     alert(t('You must select one or more files for this operation'));
     return;
@@ -217,7 +217,7 @@ function downloadFile()
 
   var filelist = new Array();
 
-  $('input:checked[id^=f_*]').each(function (i, el) {
+  $('input[type=checkbox]:checked').each(function (i, el) {
     row = $(el).parent().parent();
     filename = row.children('td:eq(1)').children('a').html();
     filelist[filelist.length] = filename;
@@ -228,7 +228,7 @@ function downloadFile()
     file = '<input id="filename" name="filename" type="hidden" value="'+filename+'"/>';
   }
 
-  var row = $('input:checked[id^=f_*]').parent().parent();
+  var row = $('input[type=checkbox]:checked').parent().parent();
   var filename = row.children('td:eq(1)').children('a').html();
   $('#download').html(
     '<input id="operation" name="operation" type="hidden" value="download"/>'+
@@ -244,7 +244,7 @@ function downloadFile()
 //Копировать файл
 function copyFile()
 {
-  var filescount = $('input:checked[id^=f_*]').length;
+  var filescount = $('input[type=checkbox]:checked').length;
   if (filescount < 1) {
     alert(t('You must select one or more files for this operation'));
     return;
@@ -259,7 +259,7 @@ function copyFile()
 
   var filenames = '<h2>'+t('Copy files or catalogs')+'</h2>';
   filenames += '<ul>';
-  $('input:checked[id^=f_*]').each(function (i, el) {
+  $('input[type=checkbox]:checked').each(function (i, el) {
     row = $(el).parent().parent();
     filename = row.children('td:eq(1)').children('a').html();
     filenames += '<li>'+filename+'</li>';

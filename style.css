@@ -1,4 +1,4 @@
-﻿/* light */
+/* light */
 
 body {
   color: #444;
@@ -42,8 +42,6 @@ th {
   margin: 0;
   text-align: left;
   font-weight: normal;
-  cursor: pointer;
-  text-decoration: underline;
   border-bottom: 1px solid #ddd;
 }
 
@@ -84,6 +82,15 @@ h2 {
 
 .field, textarea {
   border: 1px solid #dd;
+}
+
+.number {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.arrow {
+  text-decoration: none;
 }
 
 /* dark */
