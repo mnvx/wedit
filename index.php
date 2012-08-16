@@ -76,7 +76,7 @@ $path_array = explode('/', $current_rel);
 foreach ($path_array as $val) {
   $val = filename_decode($val);
   $path_simple .= ($path_simple != '/' ? '/' : '').$val;
-  $path .= ($path ? '/' : '<a href="?path=.'.$now_sort_link.'">&hellip;</a>').'<a href="?path='.$path_simple.$now_sort_link.'">'.$val.'</a>';
+  $path .= ($path ? '/' : '<a href="?path=.'.$now_sort_link.'"><img src="img/home.png" title="'.t('Home').'"></a>').'<a href="?path='.$path_simple.$now_sort_link.'">'.$val.'</a>';
 }
 
 

@@ -9,17 +9,18 @@
 
 <div id="buttons">
 <table id="buttons-table" width="100%"><tbody><tr><td width="33%">
-<input type="button" value="[#Save#]" onclick="saveFile();"/>
+<input type="button" id="btn_save" title="[#Save#]" onclick="saveFile();"/>
 </td>
 <td align="center">
 Кодировка: <input class="field" id="encoding" type="text" size="10" value=""/>
 </td>
 <td width="33%" align="right">
-<input type="button" value="[#Reload#]" onclick="reloadFile();"/>
+<input type="button" id="btn_reload" title="[#Reload#]" onclick="reloadFile();"/>
 </td></tr></tbody></table>
 </div>
 
 <input id="filename" type="hidden" value="[#filename#]"/>
+<input id="contents_oldvalue" type="hidden"/>
 
 <script type="text/javascript" language="javascript">
 
@@ -76,6 +77,7 @@ function reloadFile()
       //Обновим состояние
       $('#status').html(result.status);
       $('textarea#contents').val(result.content);
+      $('#contents_oldvalue').val(result.content);
     });
   }
 }

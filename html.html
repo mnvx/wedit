@@ -28,6 +28,7 @@ function onload()
       $(content).removeAttr('disabled');
       //Отобразим содержимое
       $(content).val(result.content);
+      $('#contents_oldvalue').val(result.content);
       //Обновим состояние
       $('#status').html(result.status);
       $('input#encoding').val(result.encoding);
@@ -38,8 +39,13 @@ function onload()
       onResize();
     });
 
-    $('textarea#contents').keydown(function() {
-      $('#status').html('<span class="textchanged">'+t('Changed')+'</span>');
+    $('textarea#contents').keyup(function() {
+      if ($('#contents_oldvalue').val() != $('textarea#contents').val()) {
+        $('#status').html('<span class="textchanged">'+t('Changed')+'</span>');
+      }
+      else {
+        $('#status').html('<span>&nbsp;</span>');
+      }
     });
   }
 }

@@ -11,8 +11,11 @@
 //    var $logintype = "Iris";
 
     //Кодировка имён файлов в фаловой системе
-    var $filename_encoding = "cp1251";
-    var $filename_encoding_zip = "cp866";
+    var $filename_encoding = "CP1251";
+    //Кодировка имён файлов в zip архивах
+    var $filename_encoding_zip = "CP866";
+    //Кодировка содержимого файлов по умолчанию (когда не удаётся определить автоматически)
+    var $default_encoding = "UTF-8";
 
     //Язык
     var $language = "ru";
@@ -130,6 +133,120 @@ h2 {
   text-decoration: none;
 }
 
+img {
+  border: none;
+}
+
+#btn_create {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCzYES2XQJwAAAnVJREFUaN7tmDtoFEEYx39JfCCGKIgGRIhCDIixEFNZJOALi4ggIphCe1HsJCBYWIiVlVY2glglEeKLoKUnCmKCYiH4wBDUFJ4JFhLlbtfmPzAs3OUyu7ezt+wfhhlmv29m/8w332OgQIECBVoNx4E5IFxhWwSuZomICwm7XcoKkaWYRALgTB6IhMA/4GAeiJg7058HIiHwBej2QaJNRNYmuOYn4GuKHH4A15tBxAc+5IUI7XmJ6rkhsqpJ634DpoB3wKzizFZgJ3AY2CtHk1n3OwMcamDPHuAuUE1q76QuewhcAa4pZQHoAoaA7cAaYB54qVhjMAiMA5uzcCIV4JS13m5grM66b4CTlmntAD4ncCqxiZyzSFwQsUb0JoFO6fUBCz6JTFokLjvovwDWSf+sLyJLMgtTnAU15IblAF7V+H7HSpdKPohM6AdWAx/ryK2X3KM69cyAZE67EokTEO+rPwr0xkxcz2v8WDEn1chesojEhVnjt4JoapE9AL5bHsdgHngQka2on1LEN+gH9mvcDWxUcTZnmVrT48iipT9tzT9fwb4XI2sa87ztckdcT6RL2cBfoGzNdwL7IrIzOsFeYIM1vy0i91O9c5R39Vo90r+5jNxyXitUlWfwOm2vdUD9wwQuu7lXm5QZp+q1htU/k/m4ogLc0PgI0JG2aVWUIJofqDqa1i197wDeZiHXGq0hswD8UqCLfitZJYS3XMu00QSy3wHgj28imahHfFeIQyKdiQrRbu+BEw2kPntEIMhazR5FWV5qOvKK0gccA3a1wtuvtwe6ag7e54J24EkOiDxtk1mNAFtalEQZuEeBAgUKtBT+A7DlzD4JGZj1AAAAAElFTkSuQmCC) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_create:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_upload {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAhCAYAAACFtMg3AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCjYGpKnbPAAAAkZJREFUWMPl2U+ITlEYx/HPXCOFWFlNiLDRlJiFjVAyTZQsbFC2ZDELJYQslPyZkhUbsaWQsTCl0SilLMwUJUqiWDDI32FmXjbn6vY272ved+693jvzq6f7/z7ne849z3nOuU2y0wK0Y0PYb8Fs/MAgHuEBroTjwmoVevB7nDaES5hfNNCZoeClGmCT9g37ERUBdjEG6gQtt17MaWTYFrxOCTa2+6G/N5zm4knKsLF1oyntAk+b4POnsTmjylyGd3iYOBdhEVaiLXSlWfgVon+masVwRq0b20fMw5oQED9VuG8EfegMX10mupkxbGzv67h/H2akHahGcwKu1wbC55+KOhscNrY3WJ4G8NWCAP/GyxAH/ka9erSkQBngQlys9+HpYUj4MsFaH/0PMaCjFtAVuFxlWKg1Z16H9WE/L+DH40lkmkNykVZrDGFj4v3t4Vxe0G3/gr2RorNhbBnDz9YcEpjYjlcDPpuio1Fsr+JrR059uq9SAdZOYF5bbiXsHkec2JMD8PNKM6B7KTo5UENwPJQx8Ndy0PP4maKDk3UMfacyBP6QzI2fpfzy3jrns024m9XQ1Byi8TUszWD6eCE4gjshJR1L28LqZgzcmlHW9QJ25TQkdFUpSFdOZdgbYaepo+4o5MZTAhavokZdHUxZI2HNW4S3UwD4BJ7GwL2THPYWjiUXAM6F9G8yqifk6aUkcH9o8smkEs5gEz6XTwHhaNgeVJCfWVV0O3D0j3UxStTIYazGdXwvEOBg+DtxJKxQdlSChT9jXhi1faAJGAAAAABJRU5ErkJggg==) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_upload:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_download {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAhCAYAAACFtMg3AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCjk3cu/HyQAAAjtJREFUWMPl2b1rFGEQx/HPrSeCihZioUFFURGDIEbtggpiEARfSuMfoI0BBRGxUkF8SS8WQVsVhaTQNBELIWghAW0lIKTQiIIEY+IlFnlWjsBdLpt94t35g4G9ZXdnvvvszs7MFcTTRnTgcNhuwUr8xFe8wyAehd8Nqzb0Y7pGG8cDbGg00OUh8Kl5wJbbGC4haQTYLRjKCDrbBrCqnmFb8Ckn2NReh/e97rQaH3KGTa0PhbwDXrLA8+/gWKSbuR1f8LZsX4LN2IO94VVagYmQ/aNqFyYjrW5q37AW7SEhfq9w3G+8Qld46qKoNzJsaqMZjr+IZXknqtIiAWe1ofD456KuOodNbQSteQA/bhDgaQyHPPA362XR1gaqADehJ+vJS8Mn4ccC73rpH+SAo/MB3Y2HVT4LtVh3let3LwLwexSKc4AWcRMXGqWor6JWtBXngH2C45pHJ6qt2t0mg4X2SsAHcF7zaX1SoQO6HqNTqQOtS2aB3sPnUKw3oyaKZbXxS2zT3BpJQjZ++h/AwscEndjv/1B/EWciXXwUz0KVw8wMupIGcT9sF3AKayLE1MfMEDxGKTeQMdMXQj7JO57e1MGviPXrrQzAtyPEMYkdqYPhyEX75XnAXokUw7VyJz2RgadwtgbYcxHHvcns1i92b1rC6SqwnZFieKHCvxg3FqEfnazQjJyMMO4thZl5xbl7EqBjr/Q4jpT57Qj78vTxPDy1NWlfqLrGIkKP4SAO5eRnFG9wFTvnAvwDxggI54mo3/oAAAAASUVORK5CYII=) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_download:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_rename {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDDs5o+z0/gAAAU5JREFUWMPt2E0rRFEYAOBnJtla2FtZmbJS8gPI50Ip+QNKFmKn/AjJwgIbCxTWSjY+llYWs7C0YaGkNBgZm3trmsY1dD9o5q230+ne7vv0nm73nkN6kcM8irjHKXplEG3YRaUmXzGRNmSvDiR1UA4FPEdgKsH17iQheWziDGMNgHaShoSFGgFdpwEJ8xzjEaCjtCBhXnwBekdfmpBq0CCegvkbprKAhHmJITzEDclh7QeQME/QEXdHtn4BeQnerhbkT0JGW5CmgWz/d8hIC9IUEFj/BaQcx9c3XzMfw+0Pn1HGDA7i7Eg7HrGPOXw00JFSEksDw1VF9rH4DSgxCGzUFIsCJQrJ465O0XqgUtDFxGIgYjn2sBSAEoW0BeNkxD3TwbiMGxwnvScuRnTmI/ib70ljc174AnCBWXSmeWSxUoW4wgK6ZBSHWEW/jOMTwvV0pZHuejYAAAAASUVORK5CYII=) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_rename:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_copy {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAuCAYAAACF6SFvAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCwocK/oxjgAAATxJREFUaN7tmL9Kw1AUxn+2QShtAp2ETF07FTp08T269SEcfY4u4u5g17yALiXtWuhaKDh00ioiDkaXCCEojddz86/ng7vc4dz8ku98994AXADPwKfheAWmlEQv/wBJDr9okAbQEarlFQ1zEr9VCc2AJwvPGAF3wG2eMDb1AbSB90M2q4KawGmWnqmNnF/mAyCMP69JqAyAcWzjXJWO2ECo7pVQ5H8P18RmoRDMogw2i4RqvwGPwg76s80uqxoAtUqzo4jmtHxgAnQN19kDN8A272j+qWfWAtG6se2ELMVdoC+wVg84K9pmkrt4D2hZOlk/ODn36Nxi7WWd0myk+4zCKIzCKIzCKMyxwuzqdDk7B4aJuVVVYbIc7734pqg9ozAKozAKozAKozAKUzxMVBGWKOt/5OvUybqMuv8CWq90jlN1HdoAAAAASUVORK5CYII=) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_copy:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_delete {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDC8veZaW+gAAAwJJREFUaN7t2NuLlVUYx/HPqBmdhrCmM1hEilQXgtVFkZ1vIoLKoAS7T4UuIoQgISL6B7wXpYuwEbSwMAii8UwjTSfDjESrEZ2SjlPOzO7m98JiIzKN2/3u2ewHXta7116n77vWep7fWvSsZz3r2WyzJ3EMjf/5nMbrnQQyE4jyeaVTQMbPE2QKq7oBpIF/8XA3gFR75o5uAGnge1xbB0RfQC5uYZvf4Yc2MvyMty4ESB12qFtAzOmWqN41IPMuULs/4kOM4GjizA24DY9iaRxNx7rfg3hkGn0uxGZMtqrvVm32Bl7Dm5Es0I/luBnzMYo9iTWV3Y93MdAJMzKBZ4v2bseWc7T7GZ4pltYtONKCWTlvkBcLiLUBm069bbg89Rbh1zpBthUQrxb5J/A1jmeAY8k7hJNFuV24JPVfqAtkPMuiOpxNJb/aB0ciJJvrfB5vVuVtLOTSUB0ggxnARThc5H+J7ViftJyBj7A6gx8uzjPL0tZzdYCsTOdP5PeBpF9lsDdhRQHzAe7FguylocxcOSv9+KfdIAvT+YamODKOtzPoCmY97sbcuOSt+An7Um+02GsH2gkymSUly6XK/7t434JbU2Z+0rvwMf4ollVV/sqU2ToTkJlqrd9xJu9XFfmj1dfB43gaV0SiDOABXI/LirNLZVcnHWunaOwv1EDZ8Yki0H2CT/Fnyk/G/R7GqQBfWtQ9lXSgnSB9uC7v3xb59+CXCMY3sD97ZVWW2cForP34LUuxmsnTeb+x3TL+oaTvJd2VdBjvYC/uwxq8jJfiIEayoY8WwXB7sUyXtltrDRYfY7jpvxE8iJ3Fxm4EcAU2FW72DBbXGUcmIhDhsbNI8kF8U3inifS1O/KlKrchbcxN1K9da607R7l9+CLBsoz0Q4XTqE1rVc+6FqjfZfirbpCOOI/UfUJcHuiOOCE2mpTvU9O41LgzAFOddmZvtjG8H7dc3qIsilpeMhvufmu7oJvsgvu5qTnY0QUgO/uyrJ7HNbMUYiwHuZ71rGc9m0X2HxbnK0GzXnnKAAAAAElFTkSuQmCC) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_delete:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_save {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCyMb8dg7xgAAAYNJREFUWMPt2D1LHUEUh/HfvfiCJhBExEIwxiaFAYuIjTZqIaRKY2pRSBn8CCnSCIKFRYoUJkVKUQsVCy0FWxElsREVEQRBJCB54aYZ4SKil7urO8IeGHZn9+yfZ2fOnDO7RG4F1GE3QrZZfKoJkJ04xQJKVQo2YSRFwGaoKbuwgvcJRf9c00xsxbLzUowxWIx9keSAOWBGdoifMQPO4/N1wCcJRRtTfOEeDF116kMOjK1NP4pFklZZ+o11HITa3ovutCCTTvEaXtygO4zjpFOcFHDpjlnowElWMXiOUfy9xWcfH7JK1IthD3mXzeEsC8CtCv3+YTsLwMI9+aYGWGkaqcVTtODLQwK+RWsFfu/wHK/D8UHzYNRpBt5g9ZZEvVHhKN9rqRvED2xiL3xn9+BlTLW4Fv2h5Vv+am0KDejCUWyAJXzEJXbCf5XoAH+V9S/yGMwBc8BHBlhEW1m/PcYR/IY+jGE8LdFCqKPfq3x+Bq8wcMO9S0xgEs+q0F7G19hD0H+9k69p4yz7RwAAAABJRU5ErkJggg==) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_save:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_reload {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDQICHaH6VwAAAjFJREFUWMPF2MtqFUEQxvFfJF4TwRskSBAUowFxIYILwQshbsQY0QcQ30FElCiKeMEncOFGEN/AhQYEBRVFUBBFyC4BIWCSE02Mtxw3fcIw5MzNmeMHvRimuurfzXRV9bTJp+XoxwHsxQ6sj7yfwie8wTM8wa+Mvo9lhejGLUygnmNM4DY2p/gfxHwaxGpcwVxOiPiYx2WsWCLGcfzAQhLILrz/R4j4eIu+SIyhAFJPghnATMkgjTGDwzGQpjD9YVvrFY65GMiSMH2oVQzSbCy0RUBW4RV2Zzhd03iIRxgLC1iHHhzB0diRz6J69OFSBvppXEBHiuM1GMbXPDvTmNyF2RTjD9iec7V9GM0Lcz3F8GOBbW/oTB6YdnxOMKqhtyDIiSVOTSLMQIrRcEGQk/iZ95u5kWAwhc4CIKdygizCjCQY3CsAchq/i+SZ9pTvYSQnSBf24W6BRdThWwLtQS3UspB5m2my1TDfE95vajVM0uq3VBBzD+6E2nYzdJGLepzwzdwvGWQw9MTRGJPY2jCoIs80K57jTeI8iHZ1VWTguM4mxBhvGFVZmxraltLGvosaV1m1N4ZgSf6vxTNnFf1Mb4YbRg0b4hPL7PQ6cD5jP32xManMHrgTO8PVdwhrM/h5jf2hsPqft4PpAJ+oVtybZsMOZtIhfKkIZCrktlzqwcuSQZ4Hv4VU1l+IGs5hZRmpvOj/mTFcDXksVW0l/LnqDkVwMpSV0ZAiXuAp/mR1/hcNHD78BVU4kQAAAABJRU5ErkJggg==) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_reload:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#newok, #change_ok, #delete_ok, #upload_ok, #copy_ok {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDQ0xJemHjgAAAYpJREFUWMPt17FKXEEUxvHfbjSBCCKCkBRJ1EoFLRSsUiSQJkjS2KWwDCpYivgEWqiPYGGtvWAjiPgAK1HSpLDYwiYmmCBG1+YKy3Lv3V1d79yAH0wxw8zwnzlnON/wqP9AT1q4VwETGMAPXIc82CoqUdtDV0iYvSqYCjbyBHONwWY2KD4gXAEfQ8HE7fUyBMwQxmPGKyFgVtAWM17OOnE/1SRudXufJchTfEsAuUJnljCLKbdSvsvz68VmypwlbMWM9+EQzxPW/cMk/tRhuMR+NF87LlJOOJ0QnoOUNc22HRTaIrJjjDRQVNfxBv141cJwf0Df7XMsNQBTxNQD5d4V/harYELpF76inAeY+Sj88gAzU1sOTvAzEMyzuNoU4nbOMJsHmHO8w24eYDqwlmQhQoSpJwnmsFkzdE+dYi4J5ix6VVmoFBXo3TSnl1WohvG2nu0s1Sn1r7GM3y0A6q834UuDFqIbC/h+R8twGvdzKNT0X+BzzOfsKMWcjWG0iRupYDvD/HxUa3UDaw+Endfc03oAAAAASUVORK5CYII=) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#newok:hover, #change_ok:hover, #delete_ok:hover, #upload_ok:hover, #copy_ok:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#newcancel, #change_cancel, #delete_cancel, #upload_cancel, #copy_cancel {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAYAAAAe2bNZAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDQ4CsRS1WwAAAbRJREFUWMPN2MFLFVEUx/GPF0WtNiHme+SqRRS1khatSp7154SrNi0MChcF/RP1H7iJIBFcFVGkheCiRdEiRbPCXpJSbe6APGyamebNzIHfauCe75w7957zmwH5YgjTmMFlnEEbg9jBAdbwAk+wjJ9KjjbuYRu/c2gTDzBZBsQw5vA9J0Sv9jAf1ysUF7D6nxC9WsHZvCBX8aVkkERf43eXGaTbJ5BEXXT+BXIO3/oMcrhCF9M+1tWKQBK9xehRMPMVgyS62wvSwo+aYHZxCkKEmcWIeuI4bhy+4jdrqkqijcjhes0giTohy3mvKK4FXGoIzBS8TyndQskJF1JyvQsYa0hlxsPfbsAaYjTEptWE6A7iM06kjJknS0w4lPJsW5xVm3DPPA541ZBtehmw2BCYp0mz/FjzFn1ACPiFRzVX5WHkABMVzL1p88x4L92tmmBuHlWqEbypGOR1mrE7H6f2KkB2shi6TrSj/QTZy2PkpguY/KzawpW8x20Sz0sGeYbThds67pRgY7q4XZYDaeN+ARexEf/rtLIkGSgwAnTink/F09DCsfj2n7Aem+8ylrCfdfE/NG1isY5Eb14AAAAASUVORK5CYII=) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#newcancel:hover, #change_cancel:hover, #delete_cancel:hover, #upload_cancel:hover, #copy_cancel:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
 /* dark */
 </style>
 <script src="jquery-1.8.0.min.js"></script>
@@ -154,6 +271,7 @@ function onload()
       $(content).removeAttr('disabled');
       //Отобразим содержимое
       $(content).val(result.content);
+      $('#contents_oldvalue').val(result.content);
       //Обновим состояние
       $('#status').html(result.status);
       $('input#encoding').val(result.encoding);
@@ -164,8 +282,13 @@ function onload()
       onResize();
     });
 
-    $('textarea#contents').keydown(function() {
-      $('#status').html('<span class="textchanged">'+t('Changed')+'</span>');
+    $('textarea#contents').keyup(function() {
+      if ($('#contents_oldvalue').val() != $('textarea#contents').val()) {
+        $('#status').html('<span class="textchanged">'+t('Changed')+'</span>');
+      }
+      else {
+        $('#status').html('<span>&nbsp;</span>');
+      }
     });
   }
 }
@@ -211,12 +334,12 @@ function onResize()
 </div>
 <div id="filelist">[#list#]</div>
 <div id="buttons">
-<input type="button" value="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
-<input type="button" value="&darr; [#Download#]" onclick="downloadFile();"/>
-<input type="button" value="[#Create#]&hellip;" onclick="createFile();"/>
-<input type="button" value="[#Copy#]&hellip;" onclick="copyFile();"/>
-<input type="button" value="[#Change#]&hellip;" onclick="changeFile();"/>
-<input type="button" value="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
+<input type="button" id="btn_upload" title="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
+<input type="button" id="btn_download" title="&darr; [#Download#]" onclick="downloadFile();"/>
+<input type="button" id="btn_create" title="[#Create#]&hellip;" onclick="createFile();"/>
+<input type="button" id="btn_copy" title="[#Copy#]&hellip;" onclick="copyFile();"/>
+<input type="button" id="btn_rename" title="[#Change#]&hellip;" onclick="changeFile();"/>
+<input type="button" id="btn_delete" title="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
 </div>
 
 <div id="dialog" style="display: none;">
@@ -273,8 +396,8 @@ function createFile()
   	  '<input id="operation" name="operation" type="hidden" value="create"/>'+
   	  '<input id="newname" name="newname" type="hidden"/>'+
   	  '<input id="newtype" name="newtype" type="hidden"/>'+
-  	  '<input id="newok" type="button" value="'+t('OK')+'" onclick="sendCreateFile();"/>'+
-  	  '<input id="newcancel" type="button" value="'+t('Cancel')+'" onclick="cancelCreateFile();"/>'+
+  	  '<input id="newok" type="button" title="'+t('OK')+'" onclick="sendCreateFile();"/>'+
+  	  '<input id="newcancel" type="button" title="'+t('Cancel')+'" onclick="cancelCreateFile();"/>'+
   	'</form></td>'+
   	'</tr>');
 }
@@ -314,8 +437,8 @@ function changeFile()
       '<input id="operation" name="operation" type="hidden" value="change"/>'+
       '<input id="oldname" name="oldname" type="hidden" value="'+old_filename+'"/>'+
       '<input id="changename" name="changename" type="hidden"/>'+
-      '<input id="change_ok" type="button" value="'+t('OK')+'" onclick="sendChangeFile();"/>'+
-      '<input id="change_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+      '<input id="change_ok" type="button" title="'+t('OK')+'" onclick="sendChangeFile();"/>'+
+      '<input id="change_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
     '</form>'
   );
 }
@@ -360,8 +483,8 @@ function deleteFile()
     '<form id="delete" method="post">'+
       '<input id="operation" name="operation" type="hidden" value="delete"/>'+
       '<input id="filelist" name="filelist" type="hidden"/>'+
-      '<input id="delete_ok" type="button" value="'+t('Delete')+'" onclick="sendDeleteFile();"/>'+
-      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+      '<input id="delete_ok" type="button" title="'+t('Delete')+'" onclick="sendDeleteFile();"/>'+
+      '<input id="delete_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
     '</form>';
 
   $('#dialog').html(filenames);
@@ -391,8 +514,8 @@ function uploadFile()
     '<form id="upload" method="post" enctype="multipart/form-data">'+
       '<input id="operation" name="operation" type="hidden" value="upload"/>'+
       '<input id="filelist" name="file[]" type="file" multiple="true"/>'+
-      '<input id="delete_ok" type="button" value="'+t('Upload')+'" onclick="sendUploadFile();"/>'+
-      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelUploadFile();"/>'+
+      '<input id="upload_ok" type="button" title="'+t('Upload')+'" onclick="sendUploadFile();"/>'+
+      '<input id="upload_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelUploadFile();"/>'+
     '</form>';
 
   $('#dialog').html(dialog);
@@ -485,8 +608,8 @@ function copyFile()
     '<input id="copyname" name="copyname" type="text" size="60"/>'+
   '</form>'+
   '<p>'+
-    '<input id="copy_ok" type="button" value="'+t('Copy')+'" onclick="sendCopyFile();"/>'+
-    '<input id="copy_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelCopyFile();"/>'+
+    '<input id="copy_ok" type="button" title="'+t('Copy')+'" onclick="sendCopyFile();"/>'+
+    '<input id="copy_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelCopyFile();"/>'+
   '</p>';
 
   $('#dialog').html(filenames);
@@ -520,17 +643,18 @@ function cancelCopyFile()
 
 <div id="buttons">
 <table id="buttons-table" width="100%"><tbody><tr><td width="33%">
-<input type="button" value="[#Save#]" onclick="saveFile();"/>
+<input type="button" id="btn_save" title="[#Save#]" onclick="saveFile();"/>
 </td>
 <td align="center">
 Кодировка: <input class="field" id="encoding" type="text" size="10" value=""/>
 </td>
 <td width="33%" align="right">
-<input type="button" value="[#Reload#]" onclick="reloadFile();"/>
+<input type="button" id="btn_reload" title="[#Reload#]" onclick="reloadFile();"/>
 </td></tr></tbody></table>
 </div>
 
 <input id="filename" type="hidden" value="[#filename#]"/>
+<input id="contents_oldvalue" type="hidden"/>
 
 <script type="text/javascript" language="javascript">
 
@@ -587,6 +711,7 @@ function reloadFile()
       //Обновим состояние
       $('#status').html(result.status);
       $('textarea#contents').val(result.content);
+      $('#contents_oldvalue').val(result.content);
     });
   }
 }
@@ -1463,6 +1588,7 @@ $lang = array(
     'Sort by access' => 'Sort by access',
     'Sort by size' => 'Sort by size',
     'Sort by date' => 'Sort by date',
+    'Home' => 'Home',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -1515,6 +1641,7 @@ $lang = array(
     'Sort by access' => 'Сортировать по доступу',
     'Sort by size' => 'Сортировать по размеру',
     'Sort by date' => 'Сортировать по дате',
+    'Home' => 'Домой',
   ),
 );
 
@@ -1576,10 +1703,78 @@ function create_guid() {
 }
 
 
-//TODO: распознавать кодировку файла по содержимому
-function detect_encoding($string)
+//Распознавать кодировку файла по содержимому
+function detect_encoding($content)
 {
-  return 'cp1251';
+  $charsets = array ( 'w' => 0, 'k' => 0, 'i' => 0, 'm' => 0, 'a' => 0, 'c' => 0, 'u' => 0 );
+
+  // Windows-1251
+  $search_l_w = "~([\270])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\377])~s";
+  $search_U_w = "~([\250])|([\300-\307])|([\310-\317])|([\320-\327])|([\330-\337])~s";
+
+  // Koi8-r
+  $search_l_k = "~([\243])|([\300-\307])|([\310-\317])|([\320-\327])|([\330-\337])~s";
+  $search_U_k = "~([\263])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\377])~s";
+
+  // Iso-8859-5
+  $search_l_i = "~([\361])|([\320-\327])|([\330-\337])|([\340-\347])|([\350-\357])~s";
+  $search_U_i = "~([\241])|([\260-\267])|([\270-\277])|([\300-\307])|([\310-\317])~s";
+
+  // X-mac-cyrillic
+  $search_l_m = "~([\336])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\370])|([\337])~s";
+  $search_U_m = "~([\335])|([\200-\207])|([\210-\217])|([\220-\227])|([\230-\237])~s";
+
+  // Ibm866
+  $search_l_a = "~([\361])|([\240-\247])|([\250-\257])|([\340-\347])|([\350-\357])~s";
+  $search_U_a = "~([\360])|([\200-\207])|([\210-\217])|([\220-\227])|([\230-\237])~s";
+
+  // Ibm855
+  $search_l_c = "~([\204])|([\234])|([\236])|([\240])|([\242])|([\244])|([\246])|([\250])|".
+  "([\252])|([\254])|([\265])|([\267])|([\275])|([\306])|([\320])|([\322])|".
+  "([\324])|([\326])|([\330])|([\340])|([\341])|([\343])|([\345])|([\347])|".
+  "([\351])|([\353])|([\355])|([\361])|([\363])|([\365])|([\367])|([\371])|([\373])~s";
+  $search_U_c = "~([\205])|([\235])|([\237])|([\241])|([\243])|([\245])|([\247])|([\251])|".
+  "([\253])|([\255])|([\266])|([\270])|([\276])|([\307])|([\321])|([\323])|".
+  "([\325])|([\327])|([\335])|([\336])|([\342])|([\344])|([\346])|([\350])|".
+  "([\352])|([\354])|([\356])|([\362])|([\364])|([\366])|([\370])|([\372])|([\374])~s";
+
+  // Utf-8
+  $search_l_u = "~([\xD1\x91])|([\xD1\x80-\x8F])|([\xD0\xB0-\xBF])~s";
+  $search_U_u = "~([\xD0\x81])|([\xD0\x90-\x9F])|([\xD0\xA0-\xAF])~s";
+
+  if ( preg_match_all ($search_l_w, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['w'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_w, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['w'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_k, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['k'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_k, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['k'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_i, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['i'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_i, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['i'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_m, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['m'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_m, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['m'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_a, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['a'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_a, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['a'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_c, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['c'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_c, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['c'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_u, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['u'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_u, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['u'] += count ($arr[0]); }
+
+  arsort ($charsets);
+  $key = key($charsets);
+  if ( max ($charsets)==0 ){ return 'unknown'; }
+  elseif ( $key == 'w' ){ return 'CP1251'; }
+  elseif ( $key == 'k' ){ return 'KOI8-R'; } 
+  elseif ( $key == 'i' ){ return 'ISO-8859-5'; } //ISO
+  elseif ( $key == 'm' ){ return 'CP10007'; } //MAC
+  elseif ( $key == 'a' ){ return 'CP866';} //IBM866
+  elseif ( $key == 'c' ){ return 'CP855';} //IBM855 
+  elseif ( $key == 'u' ){ return 'UTF-8'; } 
+
+  return 'unknown';
 }
 
 
@@ -1836,7 +2031,7 @@ $path_array = explode('/', $current_rel);
 foreach ($path_array as $val) {
   $val = filename_decode($val);
   $path_simple .= ($path_simple != '/' ? '/' : '').$val;
-  $path .= ($path ? '/' : '<a href="?path=.'.$now_sort_link.'">&hellip;</a>').'<a href="?path='.$path_simple.$now_sort_link.'">'.$val.'</a>';
+  $path .= ($path ? '/' : '<a href="?path=.'.$now_sort_link.'"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEMAAAAUCAYAAADWQYA8AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQDRkRMClwEwAAAy9JREFUWMPt2E2IllUUB/Cfb1LKfEGmlZjaJMakWfZC4iIJNaSSFoWbKAIroUVKtGgRRqibpM1sihI0+hJBIonAapMVBDFWYy2KSotARBfWSH6OY5vzwOn6jvO+o+VIHnjgufeecz/+9/zPOc/D/0euxSGciecUVmaF8U1ONAEv4AEcwWb8MYYPfjtW4DBewnuYimuKs9/S6sQLsTcheik+2zENW4v+l5sFYRxW41jhWpcSCHm/P2MBHkx0+QcYtXPw60P0BkXgU3TjEQyM8fjwF57AdHwcfTfhC/TgtjjfiHIfDhToPo8rgmMTA5Qvx6g37MbNuApzw8OfxYmkswszMWc4ENrxZjHxdzFhG17DaezDklhkDU6OERAG8WIExrvxC4Zi3+3hEd8m/QGsagTEHfihmLw3vGBR8C2PVYt04E78dJGB+D0AqC5tqBjfi8VB+d5ifDuuroC4MbjUh/2hsAV1rMdxfILn8DCejvHD+BH3455k+18/h3AvluH7ETxnY5zrlej7Nc69scoYWdZhbWq/gQ3hco1o9XiMt6f+U3g1stD1WB7gDQZHlyfdM3GTf6ILj2JT8Ls7aoUsB8KDp2FWgz0dxethPyO85a3whDqWFvqrYr2Gsi4h+VQEmSpo1mPDszA7AKhHutpfpLBKrsQHqT2vuK2ycPsovU8tdN+JoFjJMw1uvy+NT8bbqb2ogf6TzaRWeDdQ/SoQ7Yub2xG0eSj6urEn2bVF5oHOeKS2AqwJqcqdlPZU6u6KG69k5zDeWmty7bNkpHJ8RWz4YOTpg1Ha1iJmfB6u+1iyuS7AORaBaXpE8cG47SwT0R8lfmd4XX8cesoo6ovZyX5yrPd10OSGVifLNOlqwW5nsvut8JJ8g/XCTY+kuFXDZ0l3RqFbpsGeBm7fX9BsW2ovOR+ajFaGivehYcakTVXvp8+he6HXbpkmo5GZ+CYO1hYxpQpskwrdjijsTkRw7Elu3TWKtecl+86gRrX2lIsBRvUJraDHcDK3aM8/j3VrDezrrRhflvSZvha3RntO+uHxfhRQzchdkUX+TdkdZXVOlcsu4Jx7xsUHS8dlvzDwN7iX1NWKZQFiAAAAAElFTkSuQmCC" title="'.t('Home').'"></a>').'<a href="?path='.$path_simple.$now_sort_link.'">'.$val.'</a>';
 }
 
 
@@ -2079,6 +2274,9 @@ switch ($operation) {
     $encoding = $_POST['encoding'];
     if (!$encoding) {
       $encoding = detect_encoding($result['content']);
+      if ($encoding == 'unknown') {
+        $encoding = $settings->default_encoding;
+      }
     }
     if ($encoding && $encoding != 'utf-8') {
       $result['content'] = iconv($encoding, 'utf-8', $result['content']);

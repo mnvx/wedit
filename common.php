@@ -40,10 +40,78 @@ function create_guid() {
 }
 
 
-//TODO: распознавать кодировку файла по содержимому
-function detect_encoding($string)
+//Распознавать кодировку файла по содержимому
+function detect_encoding($content)
 {
-  return 'cp1251';
+  $charsets = array ( 'w' => 0, 'k' => 0, 'i' => 0, 'm' => 0, 'a' => 0, 'c' => 0, 'u' => 0 );
+
+  // Windows-1251
+  $search_l_w = "~([\270])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\377])~s";
+  $search_U_w = "~([\250])|([\300-\307])|([\310-\317])|([\320-\327])|([\330-\337])~s";
+
+  // Koi8-r
+  $search_l_k = "~([\243])|([\300-\307])|([\310-\317])|([\320-\327])|([\330-\337])~s";
+  $search_U_k = "~([\263])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\377])~s";
+
+  // Iso-8859-5
+  $search_l_i = "~([\361])|([\320-\327])|([\330-\337])|([\340-\347])|([\350-\357])~s";
+  $search_U_i = "~([\241])|([\260-\267])|([\270-\277])|([\300-\307])|([\310-\317])~s";
+
+  // X-mac-cyrillic
+  $search_l_m = "~([\336])|([\340-\347])|([\350-\357])|([\360-\367])|([\370-\370])|([\337])~s";
+  $search_U_m = "~([\335])|([\200-\207])|([\210-\217])|([\220-\227])|([\230-\237])~s";
+
+  // Ibm866
+  $search_l_a = "~([\361])|([\240-\247])|([\250-\257])|([\340-\347])|([\350-\357])~s";
+  $search_U_a = "~([\360])|([\200-\207])|([\210-\217])|([\220-\227])|([\230-\237])~s";
+
+  // Ibm855
+  $search_l_c = "~([\204])|([\234])|([\236])|([\240])|([\242])|([\244])|([\246])|([\250])|".
+  "([\252])|([\254])|([\265])|([\267])|([\275])|([\306])|([\320])|([\322])|".
+  "([\324])|([\326])|([\330])|([\340])|([\341])|([\343])|([\345])|([\347])|".
+  "([\351])|([\353])|([\355])|([\361])|([\363])|([\365])|([\367])|([\371])|([\373])~s";
+  $search_U_c = "~([\205])|([\235])|([\237])|([\241])|([\243])|([\245])|([\247])|([\251])|".
+  "([\253])|([\255])|([\266])|([\270])|([\276])|([\307])|([\321])|([\323])|".
+  "([\325])|([\327])|([\335])|([\336])|([\342])|([\344])|([\346])|([\350])|".
+  "([\352])|([\354])|([\356])|([\362])|([\364])|([\366])|([\370])|([\372])|([\374])~s";
+
+  // Utf-8
+  $search_l_u = "~([\xD1\x91])|([\xD1\x80-\x8F])|([\xD0\xB0-\xBF])~s";
+  $search_U_u = "~([\xD0\x81])|([\xD0\x90-\x9F])|([\xD0\xA0-\xAF])~s";
+
+  if ( preg_match_all ($search_l_w, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['w'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_w, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['w'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_k, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['k'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_k, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['k'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_i, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['i'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_i, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['i'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_m, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['m'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_m, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['m'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_a, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['a'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_a, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['a'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_c, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['c'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_c, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['c'] += count ($arr[0]); }
+
+  if ( preg_match_all ($search_l_u, $content, $arr, PREG_PATTERN_ORDER)) { $charsets['u'] += count ($arr[0]) * 3; }
+  if ( preg_match_all ($search_U_u, $content, $arr, PREG_PATTERN_ORDER)){ $charsets['u'] += count ($arr[0]); }
+
+  arsort ($charsets);
+  $key = key($charsets);
+  if ( max ($charsets)==0 ){ return 'unknown'; }
+  elseif ( $key == 'w' ){ return 'CP1251'; }
+  elseif ( $key == 'k' ){ return 'KOI8-R'; } 
+  elseif ( $key == 'i' ){ return 'ISO-8859-5'; } //ISO
+  elseif ( $key == 'm' ){ return 'CP10007'; } //MAC
+  elseif ( $key == 'a' ){ return 'CP866';} //IBM866
+  elseif ( $key == 'c' ){ return 'CP855';} //IBM855 
+  elseif ( $key == 'u' ){ return 'UTF-8'; } 
+
+  return 'unknown';
 }
 
 

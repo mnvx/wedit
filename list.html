@@ -7,12 +7,12 @@
 </div>
 <div id="filelist">[#list#]</div>
 <div id="buttons">
-<input type="button" value="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
-<input type="button" value="&darr; [#Download#]" onclick="downloadFile();"/>
-<input type="button" value="[#Create#]&hellip;" onclick="createFile();"/>
-<input type="button" value="[#Copy#]&hellip;" onclick="copyFile();"/>
-<input type="button" value="[#Change#]&hellip;" onclick="changeFile();"/>
-<input type="button" value="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
+<input type="button" id="btn_upload" title="&uarr; [#Upload#]&hellip;" onclick="uploadFile();"/>
+<input type="button" id="btn_download" title="&darr; [#Download#]" onclick="downloadFile();"/>
+<input type="button" id="btn_create" title="[#Create#]&hellip;" onclick="createFile();"/>
+<input type="button" id="btn_copy" title="[#Copy#]&hellip;" onclick="copyFile();"/>
+<input type="button" id="btn_rename" title="[#Change#]&hellip;" onclick="changeFile();"/>
+<input type="button" id="btn_delete" title="&empty; [#Delete#]&hellip;" onclick="deleteFile();"/>
 </div>
 
 <div id="dialog" style="display: none;">
@@ -69,8 +69,8 @@ function createFile()
   	  '<input id="operation" name="operation" type="hidden" value="create"/>'+
   	  '<input id="newname" name="newname" type="hidden"/>'+
   	  '<input id="newtype" name="newtype" type="hidden"/>'+
-  	  '<input id="newok" type="button" value="'+t('OK')+'" onclick="sendCreateFile();"/>'+
-  	  '<input id="newcancel" type="button" value="'+t('Cancel')+'" onclick="cancelCreateFile();"/>'+
+  	  '<input id="newok" type="button" title="'+t('OK')+'" onclick="sendCreateFile();"/>'+
+  	  '<input id="newcancel" type="button" title="'+t('Cancel')+'" onclick="cancelCreateFile();"/>'+
   	'</form></td>'+
   	'</tr>');
 }
@@ -110,8 +110,8 @@ function changeFile()
       '<input id="operation" name="operation" type="hidden" value="change"/>'+
       '<input id="oldname" name="oldname" type="hidden" value="'+old_filename+'"/>'+
       '<input id="changename" name="changename" type="hidden"/>'+
-      '<input id="change_ok" type="button" value="'+t('OK')+'" onclick="sendChangeFile();"/>'+
-      '<input id="change_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+      '<input id="change_ok" type="button" title="'+t('OK')+'" onclick="sendChangeFile();"/>'+
+      '<input id="change_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
     '</form>'
   );
 }
@@ -156,8 +156,8 @@ function deleteFile()
     '<form id="delete" method="post">'+
       '<input id="operation" name="operation" type="hidden" value="delete"/>'+
       '<input id="filelist" name="filelist" type="hidden"/>'+
-      '<input id="delete_ok" type="button" value="'+t('Delete')+'" onclick="sendDeleteFile();"/>'+
-      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
+      '<input id="delete_ok" type="button" title="'+t('Delete')+'" onclick="sendDeleteFile();"/>'+
+      '<input id="delete_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelChangeFile();"/>'+
     '</form>';
 
   $('#dialog').html(filenames);
@@ -187,8 +187,8 @@ function uploadFile()
     '<form id="upload" method="post" enctype="multipart/form-data">'+
       '<input id="operation" name="operation" type="hidden" value="upload"/>'+
       '<input id="filelist" name="file[]" type="file" multiple="true"/>'+
-      '<input id="delete_ok" type="button" value="'+t('Upload')+'" onclick="sendUploadFile();"/>'+
-      '<input id="delete_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelUploadFile();"/>'+
+      '<input id="upload_ok" type="button" title="'+t('Upload')+'" onclick="sendUploadFile();"/>'+
+      '<input id="upload_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelUploadFile();"/>'+
     '</form>';
 
   $('#dialog').html(dialog);
@@ -281,8 +281,8 @@ function copyFile()
     '<input id="copyname" name="copyname" type="text" size="60"/>'+
   '</form>'+
   '<p>'+
-    '<input id="copy_ok" type="button" value="'+t('Copy')+'" onclick="sendCopyFile();"/>'+
-    '<input id="copy_cancel" type="button" value="'+t('Cancel')+'" onclick="cancelCopyFile();"/>'+
+    '<input id="copy_ok" type="button" title="'+t('Copy')+'" onclick="sendCopyFile();"/>'+
+    '<input id="copy_cancel" type="button" title="'+t('Cancel')+'" onclick="cancelCopyFile();"/>'+
   '</p>';
 
   $('#dialog').html(filenames);

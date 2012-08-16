@@ -18,6 +18,9 @@ switch ($operation) {
     $encoding = $_POST['encoding'];
     if (!$encoding) {
       $encoding = detect_encoding($result['content']);
+      if ($encoding == 'unknown') {
+        $encoding = $settings->default_encoding;
+      }
     }
     if ($encoding && $encoding != 'utf-8') {
       $result['content'] = iconv($encoding, 'utf-8', $result['content']);

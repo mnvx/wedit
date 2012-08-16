@@ -93,4 +93,118 @@ h2 {
   text-decoration: none;
 }
 
+img {
+  border: none;
+}
+
+#btn_create {
+  background: url(img/create.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_create:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_upload {
+  background: url(img/upload.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_upload:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_download {
+  background: url(img/download.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_download:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_rename {
+  background: url(img/rename.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_rename:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_copy {
+  background: url(img/copy.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_copy:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_delete {
+  background: url(img/delete.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_delete:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_save {
+  background: url(img/save.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_save:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#btn_reload {
+  background: url(img/reload.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#btn_reload:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#newok, #change_ok, #delete_ok, #upload_ok, #copy_ok {
+  background: url(img/ok.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#newok:hover, #change_ok:hover, #delete_ok:hover, #upload_ok:hover, #copy_ok:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
+#newcancel, #change_cancel, #delete_cancel, #upload_cancel, #copy_cancel {
+  background: url(img/cancel.png) no-repeat center;
+  width: 65px;
+  height: 60px;
+  border: none;
+}
+#newcancel:hover, #change_cancel:hover, #delete_cancel:hover, #upload_cancel:hover, #copy_cancel:hover {
+  background-color: #eee;
+  border-radius: 3px;
+}
+
 /* dark */

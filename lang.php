@@ -52,6 +52,7 @@ $lang = array(
     'Sort by access' => 'Sort by access',
     'Sort by size' => 'Sort by size',
     'Sort by date' => 'Sort by date',
+    'Home' => 'Home',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -104,6 +105,7 @@ $lang = array(
     'Sort by access' => 'Сортировать по доступу',
     'Sort by size' => 'Сортировать по размеру',
     'Sort by date' => 'Сортировать по дате',
+    'Home' => 'Домой',
   ),
 );
 
