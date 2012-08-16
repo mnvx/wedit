@@ -9,7 +9,7 @@
 //    var $logintype = "Iris";
 
     //Кодировка имён файлов в фаловой системе
-    var $filename_encoding = "CP1251";
+    var $filename_encoding = "UTF-8";
     //Кодировка имён файлов в zip архивах
     var $filename_encoding_zip = "CP866";
     //Кодировка содержимого файлов по умолчанию (когда не удаётся определить автоматически)
