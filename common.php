@@ -41,8 +41,13 @@ function create_guid() {
 
 
 //Распознавать кодировку файла по содержимому
-function detect_encoding($content)
+function detect_encoding($content, $count=2000)
 {
+  //Для ускорения будем определять кодировку по первым 2000 символам
+  if ($count > 0) {
+    $content = substr($content, 0, $count);
+  }
+  
   $charsets = array ( 'w' => 0, 'k' => 0, 'i' => 0, 'm' => 0, 'a' => 0, 'c' => 0, 'u' => 0 );
 
   // Windows-1251
