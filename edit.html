@@ -75,7 +75,12 @@ function reloadFile()
       content.removeAttr('disabled');
       var result = jQuery.parseJSON(msg);
       //Обновим состояние
-      $('#status').html(result.status);
+      if (result.code != false) {
+        $('#status').html(result.status);
+      }
+      else {
+        $('#status').html('<span class="texterror">' + result.status + '</span>');
+      }
       $('textarea#contents').val(result.content);
       $('#contents_oldvalue').val(result.content);
     });

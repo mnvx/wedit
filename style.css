@@ -80,6 +80,15 @@ h2 {
   margin: 5px 10px 0px 5px;
 }
 
+div#info {
+  padding: 5px;
+}
+div.error {
+  padding: 5px;
+  background-color: #daa;
+  border-radius: 5px;
+}
+
 .field, textarea {
   border: 1px solid #dd;
 }
@@ -105,9 +114,11 @@ div.info h2 {
   font-size: 12pt;
   padding-top: 10px;
 }
-div.info hr {
+hr {
   border: none;
   border-top: 1px solid #aaa;
+}
+div.info hr {
   margin-top: 25px;
 }
 

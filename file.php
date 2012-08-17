@@ -30,6 +30,7 @@ if (wedit_login($settings, $info)) {
       }
       $result['status'] = t('Loaded');
       $result['encoding'] = $encoding;
+      $result['code'] = $result['content'] != false;
       break;
       
     //Сохранение файла
@@ -50,7 +51,8 @@ if (wedit_login($settings, $info)) {
   }
 }
 else {
-  $result['error_msg'] = $info;
+  $result['code'] = false;
+  $result['status'] = t('Don\'t authorised in Iris CRM');
 }
 
 echo $json->encode($result);

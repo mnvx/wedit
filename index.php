@@ -63,11 +63,27 @@ switch ($_POST['operation']) {
     $new_filename = $current.'/'.filename_encode($_POST['newname']);
     if (!file_exists($new_filename)) {
       if ($_POST['newtype'] == 'Directory') {
-        mkdir($new_filename);
+        if (!mkdir($new_filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the path').'</h3>'.
+            '<ul><li>'.$_POST['newname'].'</li></ul>'.
+            '</div>';
+        }
       }
       else {
-        touch($new_filename);
+        if (!touch($new_filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the file').'</h3>'.
+            '<ul><li>'.$_POST['newname'].'</li></ul>'.
+            '</div>';
+        }
       }
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('File already exists').'</h3>'.
+        '<ul><li>'.$_POST['newname'].'</li></ul>'.
+        '</div>';
     }
     break;
 
@@ -75,8 +91,23 @@ switch ($_POST['operation']) {
   case 'change':
     $old_filename = $current.'/'.filename_encode($_POST['oldname']);
     $change_filename = $current.'/'.filename_encode($_POST['changename']);
-    if (file_exists($old_filename)) {
-      rename($old_filename, $change_filename);
+    if (!file_exists($change_filename)) {
+      if (substr($old_filename, strlen($old_filename)-1, 1) == '.' 
+      || substr($change_filename, strlen($change_filename)-1, 1) == '.') {
+        break;
+      }
+      if (!rename($old_filename, $change_filename)) {
+        $info = '<div class="error">'.
+          '<h3>'.t('Can\'t rename the file').'</h3>'.
+          '<ul><li>'.$_POST['oldname'].' &rarr; '.$_POST['changename'].'</li></ul>'.
+          '</div>';
+      }
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('File already exists').'</h3>'.
+        '<ul><li>'.$_POST['changename'].'</li></ul>'.
+        '</div>';
     }
     break;
 
@@ -88,7 +119,11 @@ switch ($_POST['operation']) {
       $filename = $current.'/'.filename_encode($name);
       //Воизбежание опасных удалений
       if ($name != '.' && $name != '..') {
-        runlink($filename);
+        if (!runlink($filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t delete some files').'</h3>'.
+            '</div>';
+        }
       }
     }
     break;
@@ -112,7 +147,7 @@ switch ($_POST['operation']) {
         }
         $loaded++;
       }
-      $info = $info ? '<h3>Не удалось загрузить следующие файлы</h3><ul>'.$info.'</ul>' : $info;
+      $info = $info ? '<div class="error"><h3>'.t('Can\'t load next files').'</h3><ul>'.$info.'</ul></div>' : $info;
       $info .= '<h3>'.t('Files loaded').': '.$loaded.' '.t('from').' '.count($_FILES['file']['name']).'</h3><hr>';
     }
     else {
@@ -137,7 +172,7 @@ switch ($_POST['operation']) {
       $zip->addDir($filename, filename_encode(filename_decode($basename), $settings->filename_encoding_zip));
       $zip->close();
       file_download($tmpfilename, $basename.'.zip');
-      unset($tmpfilename);
+      unlink($tmpfilename);
     }
     //Скачивание нескольких файлов/каталогов - кладём их в zip
     elseif ($_POST['filelist']) {
@@ -158,10 +193,19 @@ switch ($_POST['operation']) {
             $zip->addFile($filename, filename_encode($name, $settings->filename_encoding_zip));
           }
         }
+        else {
+          //$info .= '<li>'.$filename.' ('.t('Not found').')</li>';
+        }
       }
+      //$info = $info ? '<div class="error"><h3>'.t('Can\'t download next files').'</h3><ul>'.$info.'</ul></div>' : $info;
       $zip->close();
       file_download($tmpfilename);
-      unset($tmpfilename);
+      unlink($tmpfilename);
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('Download error').'</h3>'.
+        '</div>';
     }
     break;
 
@@ -174,19 +218,38 @@ switch ($_POST['operation']) {
 //      break;
 //    }
     if (count($filenames) > 1) {
-      mkdir($copyname);
+      if (!file_exists($copyname)) {
+        if (!mkdir($copyname)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the path').'</h3>'.
+            '<ul><li>'.$_POST['copyname'].'</li></ul>'.
+            '</div>';
+        }
+      }
     }
     foreach($filenames as $name) {
       $filename = $current.'/'.filename_encode($name);
       if (count($filenames) > 1) {
-        rcopy($filename, $copyname.'/'.filename_encode($name));
+        if (!rcopy($filename, $copyname.'/'.filename_encode($name))) {
+          $info .= '<ul><li>'.$name.' &rarr; '.$_POST['copyname'].'/'.$name.'</li></ul>';
+        }
       }
       else {
         if (!file_exists($copyname)) {
-          rcopy($filename, $copyname);
+          if (!rcopy($filename, $copyname)) {
+            $info .= '<ul><li>'.$name.' &rarr; '.$_POST['copyname'].'</li></ul>';
+          }
+        }
+        else {
+          $info .= '<ul><li>'.$_POST['copyname'].' ('.t('File already exists').')</li></ul>';
         }
       }
     }
+    $info = $info ? '<div class="error">'.
+      '<h3>'.t('Can\'t copy').'</h3>'.
+      $info.
+      '</div>' : $info;
+    
     break;
 }
 
