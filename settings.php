@@ -3,10 +3,12 @@
   class Settings {
     //Кореневой каталог, относительно которого будет проводиться обзор файлов, за его пределы выйти нельзя
     var $root_path = "./..";
+    //Путь к Iris CRM, если он отличен от $root_path. Пример: "/var/www/iriscrm".
+    var $iriscrm_path = null;
 
     //Способ логина (Iris или пусто)
     var $logintype = "";
-//    var $logintype = "Iris";
+    //var $logintype = "Iris";
 
     //Кодировка имён файлов в фаловой системе
     var $filename_encoding = "UTF-8";

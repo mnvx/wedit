@@ -79,11 +79,11 @@ Screenshots
 -----------
 Browse files:
 
-![File browser](http://storage5.static.itmages.ru/i/12/0815/h_1345021737_8924627_4bbb7cdcce.png)
+![File browser](http://storage8.static.itmages.ru/i/12/0816/h_1345134156_6989463_23492a6956.png)
 
 Edit file:
 
-![Edit file](http://storage6.static.itmages.ru/i/12/0815/h_1345021754_9051636_b3cd481d93.png)
+![Edit file](http://storage1.static.itmages.ru/i/12/0816/h_1345134169_7515233_d6fd958ebd.png)
 
 Main functions
 --------------

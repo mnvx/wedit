@@ -28,7 +28,7 @@ $(document).ready(function(){
 			 * Если клик пришелся не на чекбокс, 
 			 * то инвертируем значение чекбокса, размещенного в контейнере. 
 			 */
-			if ('INPUT' != event.target.nodeName.toUpperCase()) {
+			if ('INPUT' != event.target.nodeName.toUpperCase() && 'A' != event.target.nodeName.toUpperCase()) {
 				$(this).find('input[type=checkbox]').each(function() {
           if (!$(this).attr('disabled')) {
             $(this).attr('checked', !this.checked);

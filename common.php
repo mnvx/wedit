@@ -11,7 +11,7 @@ function filename_encode($name, $encoding = null)
 
 
 //Декодировка имени файла в utf-8
-function filename_decode($name, $encoding)
+function filename_decode($name, $encoding = null)
 {
   global $settings;
   return iconv($encoding ? $encoding : $settings->filename_encoding, 'utf-8', $name);
@@ -19,7 +19,7 @@ function filename_decode($name, $encoding)
 
 
 //Генерируем GUID
-function create_guid() {
+function wedit_create_guid() {
 	if (function_exists('com_create_guid')){
 		//убираем {} и в нижний регистр, чтобы работало и как varchar
 		return strtolower(substr(com_create_guid(), 1, 36));
@@ -289,6 +289,39 @@ function runlink($file) {
     }
     rmdir($file);
   }
+}
+
+
+//Авторизация
+function wedit_login($settings, &$info) {
+  if ($settings->logintype != '') {
+    $info = null;
+    if (strtolower($settings->logintype) == 'iris') {
+      $iris_path = $settings->iriscrm_path ? $settings->iriscrm_path : $settings->root_path;
+      include_once($iris_path.'/core/engine/applib.php');
+      include_once($iris_path.'/core/engine/auth.php');
+      if (!session_id()) {
+        @session_start();
+        if (!session_id()) {
+          $info = t('Can\'t open the session').'!';
+        }
+      }
+      $path = $_SESSION['INDEX_PATH'];
+
+      if (!$info && !isAuthorised()) {
+        $info = t('Don\'t authorised in Iris CRM').' '.
+          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+      }
+      if (!$info && !IsUserInAdminGroup()) {
+        $info = t('You must be authorised like admin').' '.
+          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+      }
+    }
+    else {
+      $info = t('Unknown login type').': '.$settings->logintype;
+    }
+  }
+  return $info == null;
 }
 
 ?>

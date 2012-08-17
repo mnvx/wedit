@@ -16,41 +16,14 @@ $js_lang = 'var lang = ['.$js_lang.'];';
 $html = str_replace('[#lang#]', $js_lang, $html);
 
 //Авторизация
-if ($settings->logintype != '') {
-  $info = null;
-  if (strtolower($settings->logintype) == 'iris') {
-    include_once($settings->root_path.'/core/engine/applib.php');
-    include_once($settings->root_path.'/core/engine/auth.php');
-    if (!session_id()) {
-      @session_start();
-      if (!session_id()) {
-        $info = t('Can\'t open the settion').'!';
-      }
-    }
-    $path = $_SESSION['INDEX_PATH'];
-
-    if (!$info && !isAuthorised()) {
-      $info = t('Don\'t authorised in Iris CRM').' '.
-        '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
-    }
-    if (!$info && !IsUserInAdminGroup()) {
-      $info = t('You must be authorised like admin').' '.
-        '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
-    }
-  }
-  else {
-    $info = t('Unknown login type').': '.$settings->logintype;
-  }
-  if ($info) {
-    $html_msg = file_get_contents('info.html');
-    $html = str_replace('[#body#]', $html_msg, $html);
-    $html = str_replace('[#header#]', t('System message'), $html);
-    $html = str_replace('[#info#]', '<p>'.t($info).'</p>', $html);
-    echo $html;
-    return;
-  }
+if (!wedit_login($settings, $info)) {
+  $html_msg = file_get_contents('info.html');
+  $html = str_replace('[#body#]', $html_msg, $html);
+  $html = str_replace('[#header#]', t('System message'), $html);
+  $html = str_replace('[#info#]', '<p>'.t($info).'</p>', $html);
+  echo $html;
+  return;
 }
-
 
 //Определяем путь
 $root = str_replace('\\', '/', realpath($settings->root_path));
@@ -159,7 +132,7 @@ switch ($_POST['operation']) {
     //Скачивание каталога - кладём его в zip
     elseif ($_POST['filename'] && is_dir($filename)) {
       $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
-      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $tmpfilename = $tmp.'/'.wedit_create_guid().'.zip';
       $zip = new ZipArchiveDir();
       $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
       $zip->addDir($filename, filename_encode(filename_decode($basename), $settings->filename_encoding_zip));
@@ -170,7 +143,7 @@ switch ($_POST['operation']) {
     //Скачивание нескольких файлов/каталогов - кладём их в zip
     elseif ($_POST['filelist']) {
       $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
-      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $tmpfilename = $tmp.'/'.wedit_create_guid().'.zip';
       $zip = new ZipArchiveDir();
       $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
 
