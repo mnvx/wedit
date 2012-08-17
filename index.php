@@ -289,7 +289,8 @@ if (!is_file($current)) {
       $item['name'] = filename_decode($item['name']);
       $link_rel = filename_decode($link_rel);
       $rows .= '<tr>'.
-        '<td><input type="checkbox" id="f_'.$item['name'].'" name="'.$item['name'].'" value="'.$item['name'].'"></td>'.
+        '<td>'.(substr($item['name'], strlen($item['name'])-1, 1) == '.' ? '' 
+          : '<input type="checkbox" id="f_'.$item['name'].'" name="'.$item['name'].'" value="'.$item['name'].'">').'</td>'.
         '<td><a href="'.$link_rel.$now_sort_link.'">'.$item['name'].'</a></td>'.
         '<td>'.($item['is_dir'] ? t('Directory'): '').'</td>'.
         '<td>'.$item['access'].'</td>'.
