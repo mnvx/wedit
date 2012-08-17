@@ -24,6 +24,13 @@
     var $ignore = array(
       "wedit",
     );
+    
+    function __construct()
+    {
+      if ($this->iriscrm_path == null) {
+        $this->iriscrm_path = $this->root_path;
+      }
+    }
   };
   
   $settings = new Settings;

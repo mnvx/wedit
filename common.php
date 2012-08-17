@@ -297,9 +297,8 @@ function wedit_login($settings, &$info) {
   if ($settings->logintype != '') {
     $info = null;
     if (strtolower($settings->logintype) == 'iris') {
-      $iris_path = $settings->iriscrm_path ? $settings->iriscrm_path : $settings->root_path;
-      include_once($iris_path.'/core/engine/applib.php');
-      include_once($iris_path.'/core/engine/auth.php');
+      include_once($settings->iriscrm_path.'/core/engine/applib.php');
+      include_once($settings->iriscrm_path.'/core/engine/auth.php');
       if (!session_id()) {
         @session_start();
         if (!session_id()) {
@@ -310,11 +309,11 @@ function wedit_login($settings, &$info) {
 
       if (!$info && !isAuthorised()) {
         $info = t('Don\'t authorised in Iris CRM').' '.
-          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+          '<a href="'.$settings->iriscrm_path.'">'.t('Authorise').'</a>.';
       }
       if (!$info && !IsUserInAdminGroup()) {
         $info = t('You must be authorised like admin').' '.
-          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+          '<a href="'.$settings->iriscrm_path.'">'.t('Authorise').'</a>.';
       }
     }
     else {

@@ -35,7 +35,6 @@ list($sort_column, $sort_order) = get_sort_params($p_sort);
 $p_path = filename_encode($p_path);
 $now_sort_link = $p_sort ? '&sort='.$p_sort : '';
 
-//TODO: "/" в зависимости от ОС
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
 if (strlen($current) < strlen($root)) {
   $current = $root;

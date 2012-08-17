@@ -64,9 +64,9 @@ function onload()
       $('input#encoding').val(result.encoding);
     });
     //И установим высоту текстового редактора в полный экран
-    onResize();
+    onResize_editor();
     $(window).bind('resize', function() {
-      onResize();
+      onResize_editor();
     });
 
     $('textarea#contents').keyup(function() {
@@ -76,6 +76,12 @@ function onload()
       else {
         $('#status').html('<span>&nbsp;</span>');
       }
+    });
+  }
+  if ($('div.info')) {
+    onResize_info();
+    $(window).bind('resize', function() {
+      onResize_info();
     });
   }
 }
@@ -90,12 +96,19 @@ function t(text)
   return text;
 }
 
-function onResize() 
+function onResize_editor() 
 { 
-  $('#contents').height($(document).height() - 
+  $('#contents').height($(window).height() - 
     ($('#address').outerHeight(true) + $('#status').outerHeight(true) + $('#buttons').outerHeight(true)) -
     ($('#text').outerHeight(true) - $('#text').height() + 20)
   );
+}
+
+function onResize_info() 
+{
+  //Текст будем держать по центру экрана
+  $('div.info').css('margin-top', $(window).height() / 2 - $('div.info').height() / 2);
+  $('div.info').css('margin-left', $(window).width() / 2 - $('div.info').width() / 2);
 }
 
 [#lang#]
