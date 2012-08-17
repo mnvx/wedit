@@ -26,6 +26,13 @@
     var $ignore = array(
       "wedit",
     );
+    
+    function __construct()
+    {
+      if ($this->iriscrm_path == null) {
+        $this->iriscrm_path = $this->root_path;
+      }
+    }
   };
   
   $settings = new Settings;
@@ -122,6 +129,15 @@ h2 {
   margin: 5px 10px 0px 5px;
 }
 
+div#info {
+  padding: 5px;
+}
+div.error {
+  padding: 5px;
+  background-color: #daa;
+  border-radius: 5px;
+}
+
 .field, textarea {
   border: 1px solid #dd;
 }
@@ -135,9 +151,30 @@ h2 {
   text-decoration: none;
 }
 
+div.info {
+  width: 400px;
+  align: center;
+}
+
+div.info h1 {
+  font-size: 22pt;
+}
+div.info h2 {
+  font-size: 12pt;
+  padding-top: 10px;
+}
+hr {
+  border: none;
+  border-top: 1px solid #aaa;
+}
+div.info hr {
+  margin-top: 25px;
+}
+
 img {
   border: none;
 }
+
 
 #btn_create {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3AgQCzYES2XQJwAAAnVJREFUaN7tmDtoFEEYx39JfCCGKIgGRIhCDIixEFNZJOALi4ggIphCe1HsJCBYWIiVlVY2glglEeKLoKUnCmKCYiH4wBDUFJ4JFhLlbtfmPzAs3OUyu7ezt+wfhhlmv29m/8w332OgQIECBVoNx4E5IFxhWwSuZomICwm7XcoKkaWYRALgTB6IhMA/4GAeiJg7058HIiHwBej2QaJNRNYmuOYn4GuKHH4A15tBxAc+5IUI7XmJ6rkhsqpJ634DpoB3wKzizFZgJ3AY2CtHk1n3OwMcamDPHuAuUE1q76QuewhcAa4pZQHoAoaA7cAaYB54qVhjMAiMA5uzcCIV4JS13m5grM66b4CTlmntAD4ncCqxiZyzSFwQsUb0JoFO6fUBCz6JTFokLjvovwDWSf+sLyJLMgtTnAU15IblAF7V+H7HSpdKPohM6AdWAx/ryK2X3KM69cyAZE67EokTEO+rPwr0xkxcz2v8WDEn1chesojEhVnjt4JoapE9AL5bHsdgHngQka2on1LEN+gH9mvcDWxUcTZnmVrT48iipT9tzT9fwb4XI2sa87ztckdcT6RL2cBfoGzNdwL7IrIzOsFeYIM1vy0i91O9c5R39Vo90r+5jNxyXitUlWfwOm2vdUD9wwQuu7lXm5QZp+q1htU/k/m4ogLc0PgI0JG2aVWUIJofqDqa1i197wDeZiHXGq0hswD8UqCLfitZJYS3XMu00QSy3wHgj28imahHfFeIQyKdiQrRbu+BEw2kPntEIMhazR5FWV5qOvKK0gccA3a1wtuvtwe6ag7e54J24EkOiDxtk1mNAFtalEQZuEeBAgUKtBT+A7DlzD4JGZj1AAAAAElFTkSuQmCC) no-repeat center;
@@ -309,9 +346,9 @@ function onload()
       $('input#encoding').val(result.encoding);
     });
     //И установим высоту текстового редактора в полный экран
-    onResize();
+    onResize_editor();
     $(window).bind('resize', function() {
-      onResize();
+      onResize_editor();
     });
 
     $('textarea#contents').keyup(function() {
@@ -321,6 +358,12 @@ function onload()
       else {
         $('#status').html('<span>&nbsp;</span>');
       }
+    });
+  }
+  if ($('div.info')) {
+    onResize_info();
+    $(window).bind('resize', function() {
+      onResize_info();
     });
   }
 }
@@ -335,12 +378,19 @@ function t(text)
   return text;
 }
 
-function onResize() 
+function onResize_editor() 
 { 
-  $('#contents').height($(document).height() - 
+  $('#contents').height($(window).height() - 
     ($('#address').outerHeight(true) + $('#status').outerHeight(true) + $('#buttons').outerHeight(true)) -
     ($('#text').outerHeight(true) - $('#text').height() + 20)
   );
+}
+
+function onResize_info() 
+{
+  //Текст будем держать по центру экрана
+  $('div.info').css('margin-top', $(window).height() / 2 - $('div.info').height() / 2);
+  $('div.info').css('margin-left', $(window).width() / 2 - $('div.info').width() / 2);
 }
 
 [#lang#]
@@ -357,7 +407,7 @@ function onResize()
 
 /*************************** list.html ***************************/
 $html_list = <<<EOD
-<div>[#info#]</div>
+<div id="info">[#info#]</div>
 <div id="address">
 <table width="100%"><tbody><tr>
 <td>[#path#]</td>
@@ -740,7 +790,12 @@ function reloadFile()
       content.removeAttr('disabled');
       var result = jQuery.parseJSON(msg);
       //Обновим состояние
-      $('#status').html(result.status);
+      if (result.code != false) {
+        $('#status').html(result.status);
+      }
+      else {
+        $('#status').html('<span class="texterror">' + result.status + '</span>');
+      }
       $('textarea#contents').val(result.content);
       $('#contents_oldvalue').val(result.content);
     });
@@ -752,8 +807,14 @@ function reloadFile()
 
 /*************************** info.html ***************************/
 $html_msg = <<<EOD
-<h1>[#header#]</h1>
+<div class="info">
+<h1>Wedit</h1>
+<p>Простой легковесный веб менеджер и редактор файлов.</p>
+<h2 class="info">[#header#]</h2>
 <div>[#info#]</div>
+<hr/>
+<p>&copy; <a href="http://iris-crm.ru/wedit" title="Wedit home, about integration with Iris CRM">Iris CRM</a> team</p>
+</div>
 EOD;
 
 /*************************** json_lib.php ***************************/
@@ -1604,6 +1665,7 @@ $lang = array(
     'Select files for upload' => 'Select files for upload',
     'File already exists' => 'File already exists',
     'Copy error' => 'Copy error',
+    'Can\'t load next files' => 'Can\'t load next files',
     'Files loaded' => 'Files loaded',
     'from' => 'from',
     'Files not selected for upload' => 'Files not selected for upload',
@@ -1620,6 +1682,9 @@ $lang = array(
     'Sort by size' => 'Sort by size',
     'Sort by date' => 'Sort by date',
     'Home' => 'Home',
+    'Can\'t create the path' => 'Can\'t create the path',
+    'Can\'t create the file' => 'Can\'t create the file',
+    'Can\'t rename the file' => 'Can\'t rename the file',
   ),
   'ru' => array(
     'Loaded' => 'Загружен',
@@ -1657,6 +1722,7 @@ $lang = array(
     'Select files for upload' => 'Выберите файлы для загрузки',
     'File already exists' => 'Файл с таким именем уже существует',
     'Copy error' => 'Ошибка копирования',
+    'Can\'t load next files' => 'Не удалось загрузить следующие файлы',
     'Files loaded' => 'Загружено файлов',
     'from' => 'из',
     'Files not selected for upload' => 'Не выбраны файлы для загрузки',
@@ -1673,6 +1739,14 @@ $lang = array(
     'Sort by size' => 'Сортировать по размеру',
     'Sort by date' => 'Сортировать по дате',
     'Home' => 'Домой',
+    'Can\'t create the path' => 'Невозможно создать каталог',
+    'Can\'t create the file' => 'Невозможно создать файл',
+    'Can\'t rename the file' => 'Невозможно переименовать файл',
+    'Can\'t delete some files' => 'Невозможно удалить некоторые файлы',
+    'Download error' => 'Ошибка скачивания файлов',
+    'Not found' => 'Не найден',
+    'Can\'t download next files' => 'Невозможно скачать следующие файлы',
+    'Couldn\'t find Iris CRM files' => 'Не найдены файлы Iris CRM',
   ),
 );
 
@@ -1955,34 +2029,46 @@ class ZipArchiveDir extends ZipArchive {
 
 // copies files and non-empty directories
 function rcopy($src, $dst) {
+  $result = true;
   if (is_dir($src)) {
-    mkdir($dst);
+    $result = $result && mkdir($dst);
     $files = scandir($src);
     foreach ($files as $file)
     if ($file != "." && $file != "..") {
-      rcopy("$src/$file", "$dst/$file");
+      $result = $result && rcopy("$src/$file", "$dst/$file");
     }
   }
   elseif (file_exists($src)) {
-    copy($src, $dst);
+    if (!file_exists($dst)) {
+      $result = $result && copy($src, $dst);
+    }
+    else {
+      $result = false;
+    }
   }
+  else {
+    $result = false;
+  }
+  return $result;
 }
 
 
 //Рекурсивное удаление
 function runlink($file) {
+  $result = true;
   if (is_file($file)) {
-    unlink($file);
+    return $result && unlink($file);
   }
   else {
     $objs = scandir($file);
     foreach($objs as $obj) {
       if ($obj != "." && $obj != "..") {
-        is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj);
+        $result = $result && (is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj));
       }
     }
-    rmdir($file);
+    return $result && rmdir($file);
   }
+  return $result;
 }
 
 
@@ -1991,9 +2077,15 @@ function wedit_login($settings, &$info) {
   if ($settings->logintype != '') {
     $info = null;
     if (strtolower($settings->logintype) == 'iris') {
-      $iris_path = $settings->iriscrm_path ? $settings->iriscrm_path : $settings->root_path;
-      include_once($iris_path.'/core/engine/applib.php');
-      include_once($iris_path.'/core/engine/auth.php');
+      if (file_exists($settings->iriscrm_path.'/core/engine/applib.php') 
+      && file_exists($settings->iriscrm_path.'/core/engine/auth.php')) {
+        include_once($settings->iriscrm_path.'/core/engine/applib.php');
+        include_once($settings->iriscrm_path.'/core/engine/auth.php');
+      }
+      else {
+        $info = t('Couldn\'t find Iris CRM files');
+        return $info == null;
+      }
       if (!session_id()) {
         @session_start();
         if (!session_id()) {
@@ -2004,11 +2096,11 @@ function wedit_login($settings, &$info) {
 
       if (!$info && !isAuthorised()) {
         $info = t('Don\'t authorised in Iris CRM').' '.
-          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+          '<a href="'.$settings->iriscrm_path.'">'.t('Authorise').'</a>.';
       }
       if (!$info && !IsUserInAdminGroup()) {
         $info = t('You must be authorised like admin').' '.
-          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+          '<a href="'.$settings->iriscrm_path.'">'.t('Authorise').'</a>.';
       }
     }
     else {
@@ -2059,7 +2151,6 @@ list($sort_column, $sort_order) = get_sort_params($p_sort);
 $p_path = filename_encode($p_path);
 $now_sort_link = $p_sort ? '&sort='.$p_sort : '';
 
-//TODO: "/" в зависимости от ОС
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
 if (strlen($current) < strlen($root)) {
   $current = $root;
@@ -2088,11 +2179,27 @@ switch ($_POST['operation']) {
     $new_filename = $current.'/'.filename_encode($_POST['newname']);
     if (!file_exists($new_filename)) {
       if ($_POST['newtype'] == 'Directory') {
-        mkdir($new_filename);
+        if (!mkdir($new_filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the path').'</h3>'.
+            '<ul><li>'.$_POST['newname'].'</li></ul>'.
+            '</div>';
+        }
       }
       else {
-        touch($new_filename);
+        if (!touch($new_filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the file').'</h3>'.
+            '<ul><li>'.$_POST['newname'].'</li></ul>'.
+            '</div>';
+        }
       }
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('File already exists').'</h3>'.
+        '<ul><li>'.$_POST['newname'].'</li></ul>'.
+        '</div>';
     }
     break;
 
@@ -2100,8 +2207,23 @@ switch ($_POST['operation']) {
   case 'change':
     $old_filename = $current.'/'.filename_encode($_POST['oldname']);
     $change_filename = $current.'/'.filename_encode($_POST['changename']);
-    if (file_exists($old_filename)) {
-      rename($old_filename, $change_filename);
+    if (!file_exists($change_filename)) {
+      if (substr($old_filename, strlen($old_filename)-1, 1) == '.' 
+      || substr($change_filename, strlen($change_filename)-1, 1) == '.') {
+        break;
+      }
+      if (!rename($old_filename, $change_filename)) {
+        $info = '<div class="error">'.
+          '<h3>'.t('Can\'t rename the file').'</h3>'.
+          '<ul><li>'.$_POST['oldname'].' &rarr; '.$_POST['changename'].'</li></ul>'.
+          '</div>';
+      }
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('File already exists').'</h3>'.
+        '<ul><li>'.$_POST['changename'].'</li></ul>'.
+        '</div>';
     }
     break;
 
@@ -2113,7 +2235,11 @@ switch ($_POST['operation']) {
       $filename = $current.'/'.filename_encode($name);
       //Воизбежание опасных удалений
       if ($name != '.' && $name != '..') {
-        runlink($filename);
+        if (!runlink($filename)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t delete some files').'</h3>'.
+            '</div>';
+        }
       }
     }
     break;
@@ -2137,7 +2263,7 @@ switch ($_POST['operation']) {
         }
         $loaded++;
       }
-      $info = $info ? '<h3>Не удалось загрузить следующие файлы</h3><ul>'.$info.'</ul>' : $info;
+      $info = $info ? '<div class="error"><h3>'.t('Can\'t load next files').'</h3><ul>'.$info.'</ul></div>' : $info;
       $info .= '<h3>'.t('Files loaded').': '.$loaded.' '.t('from').' '.count($_FILES['file']['name']).'</h3><hr>';
     }
     else {
@@ -2162,7 +2288,7 @@ switch ($_POST['operation']) {
       $zip->addDir($filename, filename_encode(filename_decode($basename), $settings->filename_encoding_zip));
       $zip->close();
       file_download($tmpfilename, $basename.'.zip');
-      unset($tmpfilename);
+      unlink($tmpfilename);
     }
     //Скачивание нескольких файлов/каталогов - кладём их в zip
     elseif ($_POST['filelist']) {
@@ -2183,10 +2309,19 @@ switch ($_POST['operation']) {
             $zip->addFile($filename, filename_encode($name, $settings->filename_encoding_zip));
           }
         }
+        else {
+          //$info .= '<li>'.$filename.' ('.t('Not found').')</li>';
+        }
       }
+      //$info = $info ? '<div class="error"><h3>'.t('Can\'t download next files').'</h3><ul>'.$info.'</ul></div>' : $info;
       $zip->close();
       file_download($tmpfilename);
-      unset($tmpfilename);
+      unlink($tmpfilename);
+    }
+    else {
+      $info = '<div class="error">'.
+        '<h3>'.t('Download error').'</h3>'.
+        '</div>';
     }
     break;
 
@@ -2199,19 +2334,38 @@ switch ($_POST['operation']) {
 //      break;
 //    }
     if (count($filenames) > 1) {
-      mkdir($copyname);
+      if (!file_exists($copyname)) {
+        if (!mkdir($copyname)) {
+          $info = '<div class="error">'.
+            '<h3>'.t('Can\'t create the path').'</h3>'.
+            '<ul><li>'.$_POST['copyname'].'</li></ul>'.
+            '</div>';
+        }
+      }
     }
     foreach($filenames as $name) {
       $filename = $current.'/'.filename_encode($name);
       if (count($filenames) > 1) {
-        rcopy($filename, $copyname.'/'.filename_encode($name));
+        if (!rcopy($filename, $copyname.'/'.filename_encode($name))) {
+          $info .= '<ul><li>'.$name.' &rarr; '.$_POST['copyname'].'/'.$name.'</li></ul>';
+        }
       }
       else {
         if (!file_exists($copyname)) {
-          rcopy($filename, $copyname);
+          if (!rcopy($filename, $copyname)) {
+            $info .= '<ul><li>'.$name.' &rarr; '.$_POST['copyname'].'</li></ul>';
+          }
+        }
+        else {
+          $info .= '<ul><li>'.$_POST['copyname'].' ('.t('File already exists').')</li></ul>';
         }
       }
     }
+    $info = $info ? '<div class="error">'.
+      '<h3>'.t('Can\'t copy').'</h3>'.
+      $info.
+      '</div>' : $info;
+    
     break;
 }
 
@@ -2328,6 +2482,7 @@ if (wedit_login($settings, $info)) {
       }
       $result['status'] = t('Loaded');
       $result['encoding'] = $encoding;
+      $result['code'] = $result['content'] != false;
       break;
       
     //Сохранение файла
@@ -2348,7 +2503,8 @@ if (wedit_login($settings, $info)) {
   }
 }
 else {
-  $result['error_msg'] = $info;
+  $result['code'] = false;
+  $result['status'] = t('Don\'t authorised in Iris CRM');
 }
 
 echo $json->encode($result);

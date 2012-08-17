@@ -261,34 +261,46 @@ class ZipArchiveDir extends ZipArchive {
 
 // copies files and non-empty directories
 function rcopy($src, $dst) {
+  $result = true;
   if (is_dir($src)) {
-    mkdir($dst);
+    $result = $result && mkdir($dst);
     $files = scandir($src);
     foreach ($files as $file)
     if ($file != "." && $file != "..") {
-      rcopy("$src/$file", "$dst/$file");
+      $result = $result && rcopy("$src/$file", "$dst/$file");
     }
   }
   elseif (file_exists($src)) {
-    copy($src, $dst);
+    if (!file_exists($dst)) {
+      $result = $result && copy($src, $dst);
+    }
+    else {
+      $result = false;
+    }
   }
+  else {
+    $result = false;
+  }
+  return $result;
 }
 
 
 //Рекурсивное удаление
 function runlink($file) {
+  $result = true;
   if (is_file($file)) {
-    unlink($file);
+    return $result && unlink($file);
   }
   else {
     $objs = scandir($file);
     foreach($objs as $obj) {
       if ($obj != "." && $obj != "..") {
-        is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj);
+        $result = $result && (is_dir($file.'/'.$obj) ? runlink($file.'/'.$obj) : unlink($file.'/'.$obj));
       }
     }
-    rmdir($file);
+    return $result && rmdir($file);
   }
+  return $result;
 }
 
 
@@ -297,8 +309,15 @@ function wedit_login($settings, &$info) {
   if ($settings->logintype != '') {
     $info = null;
     if (strtolower($settings->logintype) == 'iris') {
-      include_once($settings->iriscrm_path.'/core/engine/applib.php');
-      include_once($settings->iriscrm_path.'/core/engine/auth.php');
+      if (file_exists($settings->iriscrm_path.'/core/engine/applib.php') 
+      && file_exists($settings->iriscrm_path.'/core/engine/auth.php')) {
+        include_once($settings->iriscrm_path.'/core/engine/applib.php');
+        include_once($settings->iriscrm_path.'/core/engine/auth.php');
+      }
+      else {
+        $info = t('Couldn\'t find Iris CRM files');
+        return $info == null;
+      }
       if (!session_id()) {
         @session_start();
         if (!session_id()) {
