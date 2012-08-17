@@ -9,6 +9,36 @@
 <script src="jquery-1.8.0.min.js"></script>
 
 <script type="text/javascript" language="javascript">
+
+$(document).ready(function(){
+	/*
+	 * Выбираем все строки таблицы.
+	 * Тип селектора можно изменить, главное,
+	 * чтобы под его влияние попали контейнеры, 
+	 * в пределах которых осуществляются клики. 
+	 */
+	$('table#files tr').bind('click', function(event) {
+		/*
+		 * Проверяеи тип узла. 
+		 * Нас интересует только ELEMENT_NODE, идентификатор которого равен 1. 
+		 * (во всех броузерах, включая IE)
+		 */
+		if (1 == event.target.nodeType) {
+			/*
+			 * Если клик пришелся не на чекбокс, 
+			 * то инвертируем значение чекбокса, размещенного в контейнере. 
+			 */
+			if ('INPUT' != event.target.nodeName.toUpperCase()) {
+				$(this).find('input[type=checkbox]').each(function() {
+          if (!$(this).attr('disabled')) {
+            $(this).attr('checked', !this.checked);
+          }
+				});
+			}
+		}
+	});	
+});
+
 function onload()
 {
   //Если редактируем файл, то загрузим его с сервера
