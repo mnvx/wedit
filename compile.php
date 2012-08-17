@@ -42,7 +42,9 @@ EOD;
 echo '<p>Данная утилита предназначена для запаковки wedit в 1 файл (для упрощения установки на сервере).</p>';
 echo '<p>Запуск запаковки...</p>';
 
-mkdir('wedit');
+if (!is_dir('wedit')) {
+  mkdir('wedit');
+}
 copy('jquery-1.8.0.min.js', 'wedit/jquery-1.8.0.min.js');
 
 $content = '';
@@ -178,7 +180,7 @@ echo <<<EOD
 EOD;
 
 //Добавить строку в файл
-function line($line)
+function line($line = '')
 {
   return $line."\n\r";
 }

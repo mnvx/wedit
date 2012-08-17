@@ -1,17 +1,19 @@
 <?php
 /*************************** settings.php ***************************/
-
+
 
   class Settings {
     //Кореневой каталог, относительно которого будет проводиться обзор файлов, за его пределы выйти нельзя
     var $root_path = "./..";
+    //Путь к Iris CRM, если он отличен от $root_path. Пример: "/var/www/iriscrm".
+    var $iriscrm_path = null;
 
     //Способ логина (Iris или пусто)
     var $logintype = "";
-//    var $logintype = "Iris";
+    //var $logintype = "Iris";
 
     //Кодировка имён файлов в фаловой системе
-    var $filename_encoding = "CP1251";
+    var $filename_encoding = "UTF-8";
     //Кодировка имён файлов в zip архивах
     var $filename_encoding_zip = "CP866";
     //Кодировка содержимого файлов по умолчанию (когда не удаётся определить автоматически)
@@ -252,6 +254,36 @@ img {
 <script src="jquery-1.8.0.min.js"></script>
 
 <script type="text/javascript" language="javascript">
+
+$(document).ready(function(){
+	/*
+	 * Выбираем все строки таблицы.
+	 * Тип селектора можно изменить, главное,
+	 * чтобы под его влияние попали контейнеры, 
+	 * в пределах которых осуществляются клики. 
+	 */
+	$('table#files tr').bind('click', function(event) {
+		/*
+		 * Проверяеи тип узла. 
+		 * Нас интересует только ELEMENT_NODE, идентификатор которого равен 1. 
+		 * (во всех броузерах, включая IE)
+		 */
+		if (1 == event.target.nodeType) {
+			/*
+			 * Если клик пришелся не на чекбокс, 
+			 * то инвертируем значение чекбокса, размещенного в контейнере. 
+			 */
+			if ('INPUT' != event.target.nodeName.toUpperCase() && 'A' != event.target.nodeName.toUpperCase()) {
+				$(this).find('input[type=checkbox]').each(function() {
+          if (!$(this).attr('disabled')) {
+            $(this).attr('checked', !this.checked);
+          }
+				});
+			}
+		}
+	});	
+});
+
 function onload()
 {
   //Если редактируем файл, то загрузим его с сервера
@@ -374,7 +406,6 @@ function enableCheckbox(enable)
   }
   else {
     $('input[type="checkbox"]').attr('disabled', 'true');
-//    $(':checkbox[id^=f_*]').attr('disabled', 'true');
   }
 }
 
@@ -1560,7 +1591,7 @@ $lang = array(
     'Saved' => 'Saved',
     'Error' => 'Error',
     'Reload' => 'Reload',
-    'Can\'t open the settion' => 'Can\'t open the settion',
+    'Can\'t open the session' => 'Can\'t open the session',
     'Don\'t authorised in Iris CRM' => 'Don\'t authorised in Iris CRM',
     'Authorise' => 'Authorise',
     'Unknown login type' => 'Unknown login type',
@@ -1613,7 +1644,7 @@ $lang = array(
     'Saved' => 'Сохранён',
     'Error' => 'Ошибка',
     'Reload' => 'Перечитать',
-    'Can\'t open the settion' => 'Невозможно открыть сессию',
+    'Can\'t open the session' => 'Невозможно открыть сессию',
     'Don\'t authorised in Iris CRM' => 'Необходимо авторизоваться в Iris CRM.',
     'Authorise' => 'Авторизоваться',
     'Unknown login type' => 'Неизвестный способ логина',
@@ -1674,7 +1705,7 @@ function filename_encode($name, $encoding = null)
 
 
 //Декодировка имени файла в utf-8
-function filename_decode($name, $encoding)
+function filename_decode($name, $encoding = null)
 {
   global $settings;
   return iconv($encoding ? $encoding : $settings->filename_encoding, 'utf-8', $name);
@@ -1682,7 +1713,7 @@ function filename_decode($name, $encoding)
 
 
 //Генерируем GUID
-function create_guid() {
+function wedit_create_guid() {
 	if (function_exists('com_create_guid')){
 		//убираем {} и в нижний регистр, чтобы работало и как varchar
 		return strtolower(substr(com_create_guid(), 1, 36));
@@ -1704,8 +1735,13 @@ function create_guid() {
 
 
 //Распознавать кодировку файла по содержимому
-function detect_encoding($content)
+function detect_encoding($content, $count=2000)
 {
+  //Для ускорения будем определять кодировку по первым 2000 символам
+  if ($count > 0) {
+    $content = substr($content, 0, $count);
+  }
+  
   $charsets = array ( 'w' => 0, 'k' => 0, 'i' => 0, 'm' => 0, 'a' => 0, 'c' => 0, 'u' => 0 );
 
   // Windows-1251
@@ -1950,6 +1986,39 @@ function runlink($file) {
 }
 
 
+//Авторизация
+function wedit_login($settings, &$info) {
+  if ($settings->logintype != '') {
+    $info = null;
+    if (strtolower($settings->logintype) == 'iris') {
+      $iris_path = $settings->iriscrm_path ? $settings->iriscrm_path : $settings->root_path;
+      include_once($iris_path.'/core/engine/applib.php');
+      include_once($iris_path.'/core/engine/auth.php');
+      if (!session_id()) {
+        @session_start();
+        if (!session_id()) {
+          $info = t('Can\'t open the session').'!';
+        }
+      }
+      $path = $_SESSION['INDEX_PATH'];
+
+      if (!$info && !isAuthorised()) {
+        $info = t('Don\'t authorised in Iris CRM').' '.
+          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+      }
+      if (!$info && !IsUserInAdminGroup()) {
+        $info = t('You must be authorised like admin').' '.
+          '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
+      }
+    }
+    else {
+      $info = t('Unknown login type').': '.$settings->logintype;
+    }
+  }
+  return $info == null;
+}
+
+
 if ($_POST['editor'] != 1) {
 
 /*************************** index.php ***************************/
@@ -1971,41 +2040,14 @@ $js_lang = 'var lang = ['.$js_lang.'];';
 $html = str_replace('[#lang#]', $js_lang, $html);
 
 //Авторизация
-if ($settings->logintype != '') {
-  $info = null;
-  if (strtolower($settings->logintype) == 'iris') {
-    include_once($settings->root_path.'/core/engine/applib.php');
-    include_once($settings->root_path.'/core/engine/auth.php');
-    if (!session_id()) {
-      @session_start();
-      if (!session_id()) {
-        $info = t('Can\'t open the settion').'!';
-      }
-    }
-    $path = $_SESSION['INDEX_PATH'];
-
-    if (!$info && !isAuthorised()) {
-      $info = t('Don\'t authorised in Iris CRM').' '.
-        '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
-    }
-    if (!$info && !IsUserInAdminGroup()) {
-      $info = t('You must be authorised like admin').' '.
-        '<a href="'.$settings->root_path.'">'.t('Authorise').'</a>.';
-    }
-  }
-  else {
-    $info = t('Unknown login type').': '.$settings->logintype;
-  }
-  if ($info) {
-    
-    $html = str_replace('[#body#]', $html_msg, $html);
-    $html = str_replace('[#header#]', t('System message'), $html);
-    $html = str_replace('[#info#]', '<p>'.t($info).'</p>', $html);
-    echo $html;
-    return;
-  }
+if (!wedit_login($settings, $info)) {
+  
+  $html = str_replace('[#body#]', $html_msg, $html);
+  $html = str_replace('[#header#]', t('System message'), $html);
+  $html = str_replace('[#info#]', '<p>'.t($info).'</p>', $html);
+  echo $html;
+  return;
 }
-
 
 //Определяем путь
 $root = str_replace('\\', '/', realpath($settings->root_path));
@@ -2114,7 +2156,7 @@ switch ($_POST['operation']) {
     //Скачивание каталога - кладём его в zip
     elseif ($_POST['filename'] && is_dir($filename)) {
       $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
-      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $tmpfilename = $tmp.'/'.wedit_create_guid().'.zip';
       $zip = new ZipArchiveDir();
       $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
       $zip->addDir($filename, filename_encode(filename_decode($basename), $settings->filename_encoding_zip));
@@ -2125,7 +2167,7 @@ switch ($_POST['operation']) {
     //Скачивание нескольких файлов/каталогов - кладём их в zip
     elseif ($_POST['filelist']) {
       $tmp = str_replace('\\', '/', realpath(ini_get('upload_tmp_dir')));
-      $tmpfilename = $tmp.'/'.create_guid().'.zip';
+      $tmpfilename = $tmp.'/'.wedit_create_guid().'.zip';
       $zip = new ZipArchiveDir();
       $zip->open($tmpfilename, ZIPARCHIVE::CREATE);
 
@@ -2266,40 +2308,47 @@ $json = new Services_JSON();
 $operation = $_POST['operation'];
 $result = null;
 
-switch ($operation) {
+//Авторизация
+if (wedit_login($settings, $info)) {
 
-  //Открытие файла
-  case 'load':
-    $result['content'] = file_get_contents(filename_encode($_POST['filename']));
-    $encoding = $_POST['encoding'];
-    if (!$encoding) {
-      $encoding = detect_encoding($result['content']);
-      if ($encoding == 'unknown') {
-        $encoding = $settings->default_encoding;
+  switch ($operation) {
+
+    //Открытие файла
+    case 'load':
+      $result['content'] = file_get_contents(filename_encode($_POST['filename']));
+      $encoding = $_POST['encoding'];
+      if (!$encoding) {
+        $encoding = detect_encoding($result['content']);
+        if ($encoding == 'unknown') {
+          $encoding = $settings->default_encoding;
+        }
       }
-    }
-    if ($encoding && $encoding != 'utf-8') {
-      $result['content'] = iconv($encoding, 'utf-8', $result['content']);
-    }
-    $result['status'] = t('Loaded');
-    $result['encoding'] = $encoding;
-    break;
-    
-  //Сохранение файла
-  case 'save':
-    $encoding = $_POST['encoding'];
-    $content = $_POST['filecontent'];
-    if ($encoding && $encoding != 'utf-8') {
-      $content = iconv('utf-8', $encoding, $content);
-    }
-    $result['code'] = file_put_contents(filename_encode($_POST['filename']), $content);
-    if ($result['code'] != false) {
-      $result['status'] = t('Saved');
-    }
-    else {
-      $result['status'] = t('Error');
-    }
-    break;
+      if ($encoding && $encoding != 'utf-8') {
+        $result['content'] = iconv($encoding, 'utf-8', $result['content']);
+      }
+      $result['status'] = t('Loaded');
+      $result['encoding'] = $encoding;
+      break;
+      
+    //Сохранение файла
+    case 'save':
+      $encoding = $_POST['encoding'];
+      $content = $_POST['filecontent'];
+      if ($encoding && $encoding != 'utf-8') {
+        $content = iconv('utf-8', $encoding, $content);
+      }
+      $result['code'] = file_put_contents(filename_encode($_POST['filename']), $content);
+      if ($result['code'] != false) {
+        $result['status'] = t('Saved');
+      }
+      else {
+        $result['status'] = t('Error');
+      }
+      break;
+  }
+}
+else {
+  $result['error_msg'] = $info;
 }
 
 echo $json->encode($result);

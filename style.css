@@ -93,9 +93,28 @@ h2 {
   text-decoration: none;
 }
 
+div.info {
+  width: 400px;
+  align: center;
+}
+
+div.info h1 {
+  font-size: 22pt;
+}
+div.info h2 {
+  font-size: 12pt;
+  padding-top: 10px;
+}
+div.info hr {
+  border: none;
+  border-top: 1px solid #aaa;
+  margin-top: 25px;
+}
+
 img {
   border: none;
 }
+
 
 #btn_create {
   background: url(img/create.png) no-repeat center;
