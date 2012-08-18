@@ -6,6 +6,8 @@ require_once('lang.php');
 include_once('common.php');
 
 $html = file_get_contents('html.html');
+$info = '';
+
 //Загрузка языков
 $js_lang = '';
 foreach ($lang[$settings->language] as $phrase => $translate) {
@@ -36,7 +38,12 @@ $p_path = filename_encode($p_path);
 $now_sort_link = $p_sort ? '&sort='.$p_sort : '';
 
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
-if (strlen($current) < strlen($root)) {
+//Не вышли ли за пределы домашнего каталога?
+if (substr($current, 0, strlen($root)) != $root) {
+  $info = '<div class="error">'.
+    '<h3>'.t('Attempt to go beyond your home directory').'</h3>'.
+    '<ul><li>'.$_GET['path'].'</li></ul>'.
+    '</div>';
   $current = $root;
 }
 $current_rel = str_replace($root, '', $current);
@@ -54,8 +61,6 @@ foreach ($path_array as $val) {
 
 
 //Если надо выполнить какие-то команды над файлами
-//TODO: коды ошибок
-$info = '';
 switch ($_POST['operation']) {
 
   //Создание файла
@@ -321,7 +326,7 @@ else {
 
   $html_edit = file_get_contents('edit.html');
   $html = str_replace('[#body#]', $html_edit, $html);
-  $html = str_replace('[#filename#]', filename_decode($current), $html);
+  $html = str_replace('[#filename#]', filename_decode($current_rel), $html);
   $html = str_replace('[#status#]', t('Loading').'...', $html);
   $html = str_replace('[#Save#]', t('Save'), $html);
   $html = str_replace('[#Reload#]', t('Reload'), $html);

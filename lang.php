@@ -119,6 +119,7 @@ $lang = array(
     'Not found' => 'Не найден',
     'Can\'t download next files' => 'Невозможно скачать следующие файлы',
     'Couldn\'t find Iris CRM files' => 'Не найдены файлы Iris CRM',
+    'Attempt to go beyond your home directory' => 'Попытка выйти за пределы домашнего каталога',
   ),
 );
 
