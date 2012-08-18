@@ -1747,6 +1747,7 @@ $lang = array(
     'Not found' => 'Не найден',
     'Can\'t download next files' => 'Невозможно скачать следующие файлы',
     'Couldn\'t find Iris CRM files' => 'Не найдены файлы Iris CRM',
+    'Attempt to go beyond your home directory' => 'Попытка выйти за пределы домашнего каталога',
   ),
 );
 
@@ -2122,6 +2123,8 @@ function wedit_login($settings, &$info) {
 
 
 
+$info = '';
+
 //Загрузка языков
 $js_lang = '';
 foreach ($lang[$settings->language] as $phrase => $translate) {
@@ -2152,7 +2155,12 @@ $p_path = filename_encode($p_path);
 $now_sort_link = $p_sort ? '&sort='.$p_sort : '';
 
 $current = str_replace('\\', '/', realpath($root.'/'.$p_path));
-if (strlen($current) < strlen($root)) {
+//Не вышли ли за пределы домашнего каталога?
+if (substr($current, 0, strlen($root)) != $root) {
+  $info = '<div class="error">'.
+    '<h3>'.t('Attempt to go beyond your home directory').'</h3>'.
+    '<ul><li>'.$_GET['path'].'</li></ul>'.
+    '</div>';
   $current = $root;
 }
 $current_rel = str_replace($root, '', $current);
@@ -2170,8 +2178,6 @@ foreach ($path_array as $val) {
 
 
 //Если надо выполнить какие-то команды над файлами
-//TODO: коды ошибок
-$info = '';
 switch ($_POST['operation']) {
 
   //Создание файла
@@ -2437,7 +2443,7 @@ else {
 
   
   $html = str_replace('[#body#]', $html_edit, $html);
-  $html = str_replace('[#filename#]', filename_decode($current), $html);
+  $html = str_replace('[#filename#]', filename_decode($current_rel), $html);
   $html = str_replace('[#status#]', t('Loading').'...', $html);
   $html = str_replace('[#Save#]', t('Save'), $html);
   $html = str_replace('[#Reload#]', t('Reload'), $html);
@@ -2466,41 +2472,55 @@ $result = null;
 //Авторизация
 if (wedit_login($settings, $info)) {
 
-  switch ($operation) {
+  //Полный путь к имени файла
+  $filename = str_replace('\\', '/', $_POST['filename']);
+  $root = str_replace('\\', '/', realpath($settings->root_path));
+  $current = realpath($root.'/'.filename_encode(
+    substr($filename, 0, 1) == '/' ? substr($filename, 1, strlen($filename)-1) : $filename
+  ));
+  //Не вышли ли за пределы домашнего каталога?
+  if (substr($current, 0, strlen($root)) != $root) {
+    $result['code'] = false;
+    $result['status'] = t('Attempt to go beyond your home directory');
+    $current = $root;
+  }
+  else {
+    switch ($operation) {
 
-    //Открытие файла
-    case 'load':
-      $result['content'] = file_get_contents(filename_encode($_POST['filename']));
-      $encoding = $_POST['encoding'];
-      if (!$encoding) {
-        $encoding = detect_encoding($result['content']);
-        if ($encoding == 'unknown') {
-          $encoding = $settings->default_encoding;
+      //Открытие файла
+      case 'load':
+        $result['content'] = file_get_contents($current);
+        $encoding = $_POST['encoding'];
+        if (!$encoding) {
+          $encoding = detect_encoding($result['content']);
+          if ($encoding == 'unknown') {
+            $encoding = $settings->default_encoding;
+          }
         }
-      }
-      if ($encoding && $encoding != 'utf-8') {
-        $result['content'] = iconv($encoding, 'utf-8', $result['content']);
-      }
-      $result['status'] = t('Loaded');
-      $result['encoding'] = $encoding;
-      $result['code'] = $result['content'] != false;
-      break;
-      
-    //Сохранение файла
-    case 'save':
-      $encoding = $_POST['encoding'];
-      $content = $_POST['filecontent'];
-      if ($encoding && $encoding != 'utf-8') {
-        $content = iconv('utf-8', $encoding, $content);
-      }
-      $result['code'] = file_put_contents(filename_encode($_POST['filename']), $content);
-      if ($result['code'] != false) {
-        $result['status'] = t('Saved');
-      }
-      else {
-        $result['status'] = t('Error');
-      }
-      break;
+        if ($encoding && $encoding != 'utf-8') {
+          $result['content'] = iconv($encoding, 'utf-8', $result['content']);
+        }
+        $result['status'] = t('Loaded');
+        $result['encoding'] = $encoding;
+        $result['code'] = $result['content'] != false;
+        break;
+        
+      //Сохранение файла
+      case 'save':
+        $encoding = $_POST['encoding'];
+        $content = $_POST['filecontent'];
+        if ($encoding && $encoding != 'utf-8') {
+          $content = iconv('utf-8', $encoding, $content);
+        }
+        $result['code'] = file_put_contents($current, $content);
+        if ($result['code'] != false) {
+          $result['status'] = t('Saved');
+        }
+        else {
+          $result['status'] = t('Error');
+        }
+        break;
+    }
   }
 }
 else {
